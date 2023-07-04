@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { OpenAI } from "langchain/llms/openai";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { ChromaClient } from "chromadb";
+import { Chroma } from "langchain/vectorstores/chroma";
 
 import { trimTopic } from "../utils";
 
@@ -18,8 +18,9 @@ import { prettyObject } from "../utils/format";
 const embeddings = new OpenAIEmbeddings({
   openAIApiKey: "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",
 });
-const chroma = new ChromaClient({ path: "http://localhost:8000" });
-
+// const vectorStore = await Chroma.fromDocuments("./data", embeddings, {
+//   collectionName: "a-test-collection",
+// })
 // docsearch = Chroma(persist_directory="./data", embedding_function=embeddings)
 
 const llm = new OpenAI({
