@@ -1,5 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { OpenAI } from "langchain/llms/openai";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { ChromaClient } from "chromadb";
 
 import { trimTopic } from "../utils";
 
@@ -11,6 +14,19 @@ import { StoreKey } from "../constant";
 import { api, RequestMessage } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
+
+const embeddings = new OpenAIEmbeddings({
+  openAIApiKey: "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",
+});
+const chroma = new ChromaClient({ path: "http://localhost:8000" });
+
+// docsearch = Chroma(persist_directory="./data", embedding_function=embeddings)
+
+const llm = new OpenAI({
+  modelName: "gpt-3.5-turbo-16k-0613",
+  temperature: 0.3,
+  openAIApiKey: "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",
+});
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -73,7 +89,7 @@ function createEmptySession(): ChatSession {
     mask: createEmptyMask(),
   };
 }
-
+// 核心代码
 interface ChatStore {
   sessions: ChatSession[];
   currentSessionIndex: number;
@@ -231,9 +247,10 @@ export const useChatStore = create<ChatStore>()(
         get().updateStat(message);
         get().summarizeSession();
       },
-
+      // 这里的content就是指用户输入的内容
       async onUserInput(content) {
         const session = get().currentSession();
+        // 获取GPT模型的配置
         const modelConfig = session.mask.modelConfig;
 
         const userMessage: ChatMessage = createMessage({
@@ -438,7 +455,7 @@ export const useChatStore = create<ChatStore>()(
           api.llm.chat({
             messages: topicMessages,
             config: {
-              model: "gpt-3.5-turbo",
+              model: "gpt-3.5-turbo-16k-0613",
             },
             onFinish(message) {
               get().updateCurrentSession(

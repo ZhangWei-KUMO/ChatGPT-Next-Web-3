@@ -6,7 +6,7 @@ import { type BuiltinMask } from "./typing";
 export { type BuiltinMask } from "./typing";
 
 export const BUILTIN_MASK_ID = 100000;
-
+// 内置mask
 export const BUILTIN_MASK_STORE = {
   buildinId: BUILTIN_MASK_ID,
   masks: {} as Record<number, Mask>,

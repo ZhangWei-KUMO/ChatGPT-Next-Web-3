@@ -346,8 +346,8 @@ function ExportAvatar(props: { avatar: string }) {
     return (
       <NextImage
         src={BotIcon.src}
-        width={30}
-        height={30}
+        width={50}
+        height={50}
         alt="bot"
         className="user-avatar"
       />

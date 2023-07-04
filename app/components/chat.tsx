@@ -1,6 +1,6 @@
 import { useDebouncedCallback } from "use-debounce";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
-
+import Image from "next/image";
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
@@ -256,7 +256,7 @@ export function PromptHints(props: {
     </div>
   );
 }
-
+// 清空上下文环境
 function ClearContextDivider() {
   const chatStore = useChatStore();
 
@@ -484,11 +484,12 @@ export function Chat() {
       }
     }
   };
-
+  // 发送
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "") return;
     setIsLoading(true);
     chatStore.onUserInput(userInput).then(() => setIsLoading(false));
+    // 存储最近的输入
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
@@ -751,27 +752,52 @@ export function Chat() {
           const shouldShowClearContextDivider = i === clearContextIndex - 1;
 
           return (
-            <>
+            <div key={i}>
               <div
-                key={i}
                 className={
                   isUser ? styles["chat-message-user"] : styles["chat-message"]
                 }
               >
                 <div className={styles["chat-message-container"]}>
-                  <div className={styles["chat-message-avatar"]}>
-                    {message.role === "user" ? (
-                      <Avatar avatar={config.avatar} />
-                    ) : (
-                      <MaskAvatar mask={session.mask} />
-                    )}
-                  </div>
-                  {showTyping && (
+                  {/* <div className={styles["chat-message-avatar"]}> */}
+                  {message.role === "user" ? (
+                    // <Avatar avatar={config.avatar} />
+                    <Image
+                      src="/user-avatar.png"
+                      alt="avatar"
+                      style={{ float: "right" }}
+                      className="user-avatar"
+                      width={50}
+                      height={50}
+                    />
+                  ) : (
+                    <Image
+                      src="/bot-avatar.png"
+                      alt="avatar"
+                      className="user-avatar"
+                      width={50}
+                      height={50}
+                    />
+                    // <MaskAvatar mask={session.mask} />
+                  )}
+                  {/* </div> */}
+                  {showTyping && message.role !== "user" && (
                     <div className={styles["chat-message-status"]}>
                       {Locale.Chat.Typing}
                     </div>
                   )}
-                  <div className={styles["chat-message-item"]}>
+                  <div
+                    className={
+                      message.role === "user"
+                        ? styles["chat-message-item-right"]
+                        : styles["chat-message-item-left"]
+                    }
+                    style={
+                      message.role !== "user"
+                        ? { marginLeft: 80 }
+                        : { marginRight: 80 }
+                    }
+                  >
                     {showActions && (
                       <div className={styles["chat-message-top-actions"]}>
                         {message.streaming ? (
@@ -832,7 +858,7 @@ export function Chat() {
                 </div>
               </div>
               {shouldShowClearContextDivider && <ClearContextDivider />}
-            </>
+            </div>
           );
         })}
       </div>

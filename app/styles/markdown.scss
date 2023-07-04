@@ -483,7 +483,7 @@
 
 .markdown-body::after {
   display: table;
-  clear: both;
+  // clear: both;
   content: "";
 }
 
@@ -806,7 +806,9 @@
 .markdown-body tt br {
   display: none;
 }
-
+del {
+  text-decoration:none!important;
+}
 .markdown-body del code {
   text-decoration: inherit;
 }

@@ -9,7 +9,7 @@
   --black: rgb(48, 48, 48);
   --gray: rgb(250, 250, 250);
   --primary: rgb(29, 147, 171);
-  --second: rgb(231, 248, 255);
+  --second: rgb(149, 236, 105);
   --hover-color: #f3f3f3;
   --bar-color: rgba(0, 0, 0, 0.1);
   --theme-color: var(--gray);
@@ -336,16 +336,17 @@ pre {
 }
 
 .user-avatar {
-  height: 30px;
-  min-height: 30px;
-  width: 30px;
-  min-width: 30px;
+  height: 50px;
+  min-height: 50px;
+  width: 50px;
+  min-width: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: var(--border-in-light);
   box-shadow: var(--card-shadow);
   border-radius: 10px;
+  float: left;
 }
 
 .one-line {

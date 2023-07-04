@@ -46,7 +46,7 @@ export const createEmptyMask = () =>
     lang: getLang(),
     builtin: false,
   } as Mask);
-
+// store
 export const useMaskStore = create<MaskStore>()(
   persist(
     (set, get) => ({

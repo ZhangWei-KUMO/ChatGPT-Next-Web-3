@@ -9,8 +9,8 @@ const CN_URL = MIRRORF_FILE_URL + RAW_CN_URL;
 const RAW_EN_URL = "f/awesome-chatgpt-prompts/main/prompts.csv";
 const EN_URL = MIRRORF_FILE_URL + RAW_EN_URL;
 const FILE = "./public/prompts.json";
-
-const ignoreWords = ["涩涩", "魅魔"];
+// 敏感词
+const ignoreWords = ["涩涩", "魅魔","习近平"];
 
 const timeoutPromise = (timeout) => {
   return new Promise((resolve, reject) => {

@@ -76,7 +76,7 @@ function useMaskGroup(masks: Mask[]) {
 
   return groups;
 }
-
+// 初始化的一个新的聊天
 export function NewChat() {
   const chatStore = useChatStore();
   const maskStore = useMaskStore();
@@ -90,8 +90,9 @@ export function NewChat() {
   const maskRef = useRef<HTMLDivElement>(null);
 
   const { state } = useLocation();
-
+  // 启动一个新的聊天窗口
   const startChat = (mask?: Mask) => {
+    // 将默认数据存储进chatStore
     chatStore.newSession(mask);
     setTimeout(() => navigate(Path.Chat), 1);
   };

@@ -5,6 +5,7 @@ const nextConfig = {
     const ret = [
       {
         source: "/api/proxy/:path*",
+      // 在本地开发时需要对其进行替换
         destination: "https://api.openai.com/:path*",
       },
       {
