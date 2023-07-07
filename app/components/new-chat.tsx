@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Path, SlotID } from "../constant";
 import { IconButton } from "./button";
-import { EmojiAvatar } from "./emoji";
+import Image from "next/image";
 import styles from "./new-chat.module.scss";
 
 import LeftIcon from "../icons/left.svg";
@@ -90,7 +90,7 @@ export function NewChat() {
   const maskRef = useRef<HTMLDivElement>(null);
 
   const { state } = useLocation();
-  // 启动一个新的聊天窗口
+  // 启动默认聊天窗口
   const startChat = (mask?: Mask) => {
     // 将默认数据存储进chatStore
     chatStore.newSession(mask);
@@ -139,13 +139,13 @@ export function NewChat() {
       </div>
       <div className={styles["mask-cards"]}>
         <div className={styles["mask-card"]}>
-          <EmojiAvatar avatar="1f606" size={24} />
+          <Image src="/doctor1.jpeg" alt="doctor1" width={70} height={100} />
         </div>
         <div className={styles["mask-card"]}>
-          <EmojiAvatar avatar="1f916" size={24} />
+          <Image src="/doctor2.jpeg" alt="doctor2" width={70} height={100} />
         </div>
         <div className={styles["mask-card"]}>
-          <EmojiAvatar avatar="1f479" size={24} />
+          <Image src="/doctor4.jpeg" alt="doctor4" width={70} height={100} />
         </div>
       </div>
 

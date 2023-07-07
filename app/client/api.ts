@@ -25,7 +25,7 @@ export interface LLMConfig {
 export interface ChatOptions {
   messages: RequestMessage[];
   config: LLMConfig;
-
+  // 接受的message为文本流，为了更新前端的信息所以不断地更新
   onUpdate?: (message: string, chunk: string) => void;
   onFinish: (message: string) => void;
   onError?: (err: Error) => void;
@@ -72,6 +72,7 @@ export class ClientApi {
     // Please do not modify this message
 
     console.log("[Share]", msgs);
+    console.log("[avatarUrl]", avatarUrl);
     const res = await fetch("/sharegpt", {
       body: JSON.stringify({
         avatarUrl,

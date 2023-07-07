@@ -2,7 +2,8 @@
   "name": "chatgpt-next-web",
   "version": "1.9.3",
   "private": false,
-  "license": "Anti 996",  "scripts": {
+  "license": "Anti 996",
+  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -14,9 +15,11 @@
   "dependencies": {
     "@fortaine/fetch-event-source": "^3.0.6",
     "@hello-pangea/dnd": "^16.2.0",
+    "@pinecone-database/pinecone": "^0.1.6",
     "@svgr/webpack": "^6.5.1",
     "@vercel/analytics": "^0.1.11",
     "chromadb": "^1.5.3",
+    "dotenv": "^16.3.1",
     "emoji-picker-react": "^4.4.7",
     "fuse.js": "^6.6.2",
     "html-to-image": "^1.11.11",
@@ -35,6 +38,7 @@
     "remark-math": "^5.1.1",
     "sass": "^1.59.2",
     "spark-md5": "^3.0.2",
+    "swr": "^2.2.0",
     "use-debounce": "^9.0.3",
     "zustand": "^4.3.6"
   },
@@ -45,6 +49,7 @@
     "@types/react-katex": "^3.0.0",
     "@types/spark-md5": "^3.0.2",
     "cross-env": "^7.0.3",
+    "encoding": "^0.1.13",
     "eslint": "^8.36.0",
     "eslint-config-next": "13.2.3",
     "eslint-config-prettier": "^8.8.0",

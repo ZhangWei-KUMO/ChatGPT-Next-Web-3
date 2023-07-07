@@ -25,8 +25,9 @@ export class ChatGPTApi implements LLMApi {
   extractMessage(res: any) {
     return res.choices?.at(0)?.message?.content ?? "";
   }
-
+  // 发送请求
   async chat(options: ChatOptions) {
+    // 将所有的信息列表进行抽取
     const messages = options.messages.map((v) => ({
       role: v.role,
       content: v.content,
@@ -55,6 +56,7 @@ export class ChatGPTApi implements LLMApi {
     options.onController?.(controller);
 
     try {
+      // 直接调用的oepnAI的接口 /api/openai/v1/chat/completions
       const chatPath = this.path(this.ChatPath);
       const chatPayload = {
         method: "POST",
@@ -63,7 +65,7 @@ export class ChatGPTApi implements LLMApi {
         headers: getHeaders(),
       };
 
-      // make a fetch request
+      // make a fetch request，
       const requestTimeoutId = setTimeout(
         () => controller.abort(),
         REQUEST_TIMEOUT_MS,
@@ -81,7 +83,7 @@ export class ChatGPTApi implements LLMApi {
         };
 
         controller.signal.onabort = finish;
-
+        //
         fetchEventSource(chatPath, {
           ...chatPayload,
           async onopen(res) {
@@ -124,6 +126,7 @@ export class ChatGPTApi implements LLMApi {
               return finish();
             }
           },
+          // 监听文本流
           onmessage(msg) {
             if (msg.data === "[DONE]" || finished) {
               return finish();
@@ -173,7 +176,7 @@ export class ChatGPTApi implements LLMApi {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startDate = formatDate(startOfMonth);
     const endDate = formatDate(new Date(Date.now() + ONE_DAY));
-
+    // 获取当前API KEY的使用情况
     const [used, subs] = await Promise.all([
       fetch(
         this.path(

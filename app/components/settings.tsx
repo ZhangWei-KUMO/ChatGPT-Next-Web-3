@@ -490,10 +490,7 @@ export function Settings() {
               subTitle={Locale.Settings.AccessCode.SubTitle}
             >
               <PasswordInput
-                value={
-                  accessStore.accessCode ||
-                  "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"
-                }
+                value={accessStore.accessCode}
                 type="text"
                 placeholder={Locale.Settings.AccessCode.Placeholder}
                 onChange={(e) => {

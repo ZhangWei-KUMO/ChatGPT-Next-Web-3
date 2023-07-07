@@ -11,7 +11,6 @@ const DANGER_CONFIG = {
   hideUserApiKey: serverConfig.hideUserApiKey,
   enableGPT4: serverConfig.enableGPT4,
 };
-
 declare global {
   type DangerConfig = typeof DANGER_CONFIG;
 }

@@ -17,6 +17,8 @@ async function handle(
   }
 
   try {
+    //console.log("发起请求：",req)
+    // 向封装好的OpenAI API 发起request
     return await requestOpenai(req);
   } catch (e) {
     console.error("[OpenAI] ", e);

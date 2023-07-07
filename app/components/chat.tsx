@@ -21,6 +21,7 @@ import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
+import useSWR from "swr";
 
 import {
   ChatMessage,
@@ -423,7 +424,7 @@ export function Chat() {
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
-
+  // 监听聊天记录是否到底
   const onChatBodyScroll = (e: HTMLElement) => {
     const isTouchBottom = e.scrollTop + e.clientHeight >= e.scrollHeight - 100;
     setHitBottom(isTouchBottom);
@@ -485,13 +486,17 @@ export function Chat() {
     }
   };
   // 发送
-  const doSubmit = (userInput: string) => {
+  const doSubmit = async (userInput: string) => {
     if (userInput.trim() === "") return;
     setIsLoading(true);
-    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
+    // 清除输入框中的文字
     // 存储最近的输入
     localStorage.setItem(LAST_INPUT_KEY, userInput);
+    const res = await fetch("/api/private/" + userInput);
+    let { context } = await res.json();
+    chatStore.onUserInput(userInput, context).then(() => setIsLoading(false));
     setUserInput("");
+
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
@@ -530,6 +535,20 @@ export function Chat() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onResend = async (botMessageId: number) => {
+    // find last user input message and resend
+    const userIndex = findLastUserIndex(botMessageId);
+    if (userIndex === null) return;
+
+    setIsLoading(true);
+    const res = await fetch("/api/private/" + userInput);
+    let { context } = await res.json();
+    const content = session.messages[userIndex].content;
+    deleteMessage(userIndex);
+    chatStore.onUserInput(content, context).then(() => setIsLoading(false));
+    inputRef.current?.focus();
+  };
 
   // check if should send message
   const onInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -583,18 +602,6 @@ export function Chat() {
     deleteMessage(userIndex);
   };
 
-  const onResend = (botMessageId: number) => {
-    // find last user input message and resend
-    const userIndex = findLastUserIndex(botMessageId);
-    if (userIndex === null) return;
-
-    setIsLoading(true);
-    const content = session.messages[userIndex].content;
-    deleteMessage(userIndex);
-    chatStore.onUserInput(content).then(() => setIsLoading(false));
-    inputRef.current?.focus();
-  };
-
   const context: RenderMessage[] = session.mask.hideContext
     ? []
     : session.mask.context.slice();
@@ -618,22 +625,9 @@ export function Chat() {
       ? session.clearContextIndex! + context.length
       : -1;
 
-  // preview messages
+  // 预览聊天记录
   const messages = context
     .concat(session.messages as RenderMessage[])
-    .concat(
-      isLoading
-        ? [
-            {
-              ...createMessage({
-                role: "assistant",
-                content: "……",
-              }),
-              preview: true,
-            },
-          ]
-        : [],
-    )
     .concat(
       userInput.length > 0 && config.sendPreviewBubble
         ? [
@@ -646,16 +640,29 @@ export function Chat() {
             },
           ]
         : [],
+    )
+    .concat(
+      isLoading
+        ? [
+            {
+              ...createMessage({
+                role: "assistant",
+                content: "……",
+              }),
+              preview: true,
+            },
+          ]
+        : [],
     );
+  // 弹出prompt弹出框
+  // const [showPromptModal, setShowPromptModal] = useState(false);
 
-  const [showPromptModal, setShowPromptModal] = useState(false);
-
-  const renameSession = () => {
-    const newTopic = prompt(Locale.Chat.Rename, session.topic);
-    if (newTopic && newTopic !== session.topic) {
-      chatStore.updateCurrentSession((session) => (session.topic = newTopic!));
-    }
-  };
+  // const renameSession = () => {
+  //   const newTopic = prompt(Locale.Chat.Rename, session.topic);
+  //   if (newTopic && newTopic !== session.topic) {
+  //     chatStore.updateCurrentSession((session) => (session.topic = newTopic!));
+  //   }
+  // };
 
   const location = useLocation();
   const isChat = location.pathname === Path.Chat;
@@ -674,7 +681,6 @@ export function Chat() {
         <div className="window-header-title">
           <div
             className={`window-header-main-title " ${styles["chat-body-title"]}`}
-            onClickCapture={renameSession}
           >
             {!session.topic ? DEFAULT_TOPIC : session.topic}
           </div>
@@ -691,13 +697,13 @@ export function Chat() {
               onClick={() => navigate(Path.Home)}
             />
           </div>
-          <div className="window-action-button">
+          {/* <div className="window-action-button">
             <IconButton
               icon={<RenameIcon />}
               bordered
               onClick={renameSession}
             />
-          </div>
+          </div> */}
           <div className="window-action-button">
             <IconButton
               icon={<ExportIcon />}
@@ -722,12 +728,14 @@ export function Chat() {
             </div>
           )}
         </div>
-
-        <PromptToast
+        {/**
+         * 提示词浮窗，在聊天记录到底的时候会隐藏
+         */}
+        {/* <PromptToast
           showToast={!hitBottom}
           showModal={showPromptModal}
           setShowModal={setShowPromptModal}
-        />
+        /> */}
       </div>
 
       <div
@@ -752,7 +760,12 @@ export function Chat() {
           const shouldShowClearContextDivider = i === clearContextIndex - 1;
 
           return (
-            <div key={i}>
+            <div
+              key={i}
+              style={{
+                display: i + 1 === messages.length && isUser ? "none" : "block",
+              }}
+            >
               <div
                 className={
                   isUser ? styles["chat-message-user"] : styles["chat-message"]
@@ -865,13 +878,14 @@ export function Chat() {
 
       <div className={styles["chat-input-panel"]}>
         <PromptHints prompts={promptHints} onPromptSelect={onPromptSelect} />
-
-        <ChatActions
+        {/**
+         * 工具栏
+         */}
+        {/* <ChatActions
           showPromptModal={() => setShowPromptModal(true)}
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
           showPromptHints={() => {
-            // Click again to close
             if (promptHints.length > 0) {
               setPromptHints([]);
               return;
@@ -881,14 +895,14 @@ export function Chat() {
             setUserInput("/");
             onSearch("");
           }}
-        />
+        /> */}
         <div className={styles["chat-input-panel-inner"]}>
           <textarea
             ref={inputRef}
             className={styles["chat-input"]}
             placeholder={Locale.Chat.Input(submitKey)}
             onInput={(e) => onInput(e.currentTarget.value)}
-            value={userInput}
+            value={isLoading ? "" : userInput}
             onKeyDown={onInputKeyDown}
             onFocus={() => setAutoScroll(true)}
             onBlur={() => setAutoScroll(false)}
