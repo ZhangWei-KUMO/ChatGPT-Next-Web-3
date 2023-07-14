@@ -31,7 +31,7 @@ export async function requestOpenai(req: NextRequest) {
   }, 10 * 60 * 1000);
 
   const fetchUrl = `${baseUrl}/${openaiPath}`;
-  const fetchOptions: RequestInit = {
+  const fetchOptions: any = {
     headers: {
       "Content-Type": "application/json",
       Authorization: authValue,
@@ -42,6 +42,7 @@ export async function requestOpenai(req: NextRequest) {
     cache: "no-store",
     method: req.method,
     body: req.body,
+    duplex: true,
     signal: controller.signal,
   };
 

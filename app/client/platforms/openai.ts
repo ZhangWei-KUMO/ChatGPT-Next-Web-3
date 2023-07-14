@@ -61,7 +61,7 @@ export class ChatGPTApi implements LLMApi {
       const chatPayload = {
         method: "POST",
         body: JSON.stringify(requestPayload),
-        duplex: "half",
+        duplex: true,
         signal: controller.signal,
         headers: getHeaders(),
       };
