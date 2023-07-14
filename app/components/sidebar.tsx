@@ -157,7 +157,7 @@ export function SideBar(props: { className?: string }) {
             </Link>
           </div>
         </div>
-        {/* <div>
+        <div>
           <IconButton
             icon={<AddIcon />}
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
@@ -171,7 +171,7 @@ export function SideBar(props: { className?: string }) {
             }}
             shadow
           />
-        </div> */}
+        </div>
       </div>
 
       <div
