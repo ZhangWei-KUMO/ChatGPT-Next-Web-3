@@ -18,7 +18,7 @@ const nextConfig = {
       },
     ];
 
-    const apiUrl = process.env.API_URL;
+    const apiUrl = process.env.BASE_URL;
     if (apiUrl) {
       console.log("[Next] using api url ", apiUrl);
       ret.push({
