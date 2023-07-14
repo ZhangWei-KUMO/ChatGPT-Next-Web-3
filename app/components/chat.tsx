@@ -168,10 +168,7 @@ function useSubmitHandler() {
     if (e.key !== "Enter") return false;
     if (e.key === "Enter" && e.nativeEvent.isComposing) return false;
     return (
-      (config.submitKey === SubmitKey.AltEnter && e.altKey) ||
       (config.submitKey === SubmitKey.CtrlEnter && e.ctrlKey) ||
-      (config.submitKey === SubmitKey.ShiftEnter && e.shiftKey) ||
-      (config.submitKey === SubmitKey.MetaEnter && e.metaKey) ||
       (config.submitKey === SubmitKey.Enter &&
         !e.altKey &&
         !e.ctrlKey &&
@@ -682,7 +679,7 @@ export function Chat() {
           <div
             className={`window-header-main-title " ${styles["chat-body-title"]}`}
           >
-            {!session.topic ? DEFAULT_TOPIC : session.topic}
+            {/* {!session.topic ? DEFAULT_TOPIC : session.topic} */}
           </div>
           <div className="window-header-sub-title">
             {Locale.Chat.SubTitle(session.messages.length)}
@@ -704,7 +701,7 @@ export function Chat() {
               onClick={renameSession}
             />
           </div> */}
-          <div className="window-action-button">
+          {/* <div className="window-action-button">
             <IconButton
               icon={<ExportIcon />}
               bordered
@@ -713,8 +710,8 @@ export function Chat() {
                 setShowExport(true);
               }}
             />
-          </div>
-          {!isMobileScreen && (
+          </div> */}
+          {/* {!isMobileScreen && (
             <div className="window-action-button">
               <IconButton
                 icon={config.tightBorder ? <MinIcon /> : <MaxIcon />}
@@ -726,7 +723,7 @@ export function Chat() {
                 }}
               />
             </div>
-          )}
+          )} */}
         </div>
         {/**
          * 提示词浮窗，在聊天记录到底的时候会隐藏

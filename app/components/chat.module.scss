@@ -157,13 +157,13 @@
   }
 
   &-revert-btn {
-    color: var(--primary);
+    color: var(--yellow);
     @include hide;
   }
 
   &:hover {
     opacity: 1;
-    border-color: var(--primary);
+    border-color: var(--yellow);
 
     .clear-context-tips {
       @include hide;

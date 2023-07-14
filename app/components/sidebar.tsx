@@ -119,8 +119,8 @@ export function SideBar(props: { className?: string }) {
       }`}
     >
       <div className={styles["sidebar-header"]}>
-        <div className={styles["sidebar-title"]}>REL AI</div>
-        <div className={styles["sidebar-sub-title"]}>永远陪伴您的心理医生</div>
+        <div className={styles["sidebar-title"]}></div>
+        <div className={styles["sidebar-sub-title"]}></div>
         <div className={styles["sidebar-logo"] + " no-dark"}>
           {/* <ChatGptIcon /> */}
         </div>
@@ -136,7 +136,7 @@ export function SideBar(props: { className?: string }) {
           }
         }}
       >
-        <ChatList narrow={shouldNarrow} />
+        {/* <ChatList narrow={shouldNarrow} /> */}
       </div>
 
       <div className={styles["sidebar-tail"]}>
@@ -157,7 +157,7 @@ export function SideBar(props: { className?: string }) {
             </Link>
           </div>
         </div>
-        <div>
+        {/* <div>
           <IconButton
             icon={<AddIcon />}
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
@@ -171,7 +171,7 @@ export function SideBar(props: { className?: string }) {
             }}
             shadow
           />
-        </div>
+        </div> */}
       </div>
 
       <div

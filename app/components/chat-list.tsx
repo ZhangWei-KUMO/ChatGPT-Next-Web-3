@@ -121,7 +121,7 @@ export function ChatList(props: { narrow?: boolean }) {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="chat-list">
+      {/* <Droppable droppableId="chat-list">
         {(provided) => (
           <div
             className={styles["chat-list"]}
@@ -153,7 +153,7 @@ export function ChatList(props: { narrow?: boolean }) {
             {provided.placeholder}
           </div>
         )}
-      </Droppable>
+      </Droppable> */}
     </DragDropContext>
   );
 }

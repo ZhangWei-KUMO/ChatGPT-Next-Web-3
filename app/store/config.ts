@@ -5,9 +5,6 @@ import { StoreKey } from "../constant";
 export enum SubmitKey {
   Enter = "Enter",
   CtrlEnter = "Ctrl + Enter",
-  ShiftEnter = "Shift + Enter",
-  AltEnter = "Alt + Enter",
-  MetaEnter = "Meta + Enter",
 }
 
 export enum Theme {
@@ -15,27 +12,32 @@ export enum Theme {
   Dark = "dark",
   Light = "light",
 }
-
+// 默认配置
 export const DEFAULT_CONFIG = {
-  submitKey: SubmitKey.CtrlEnter as SubmitKey,
+  submitKey: SubmitKey.Enter as SubmitKey,
   avatar: "1f603",
-  fontSize: 14,
+  fontSize: 16,
   theme: Theme.Auto as Theme,
   tightBorder: false,
   sendPreviewBubble: true,
   sidebarWidth: 300,
-
-  disablePromptHint: false,
-
+  // 禁止使用\提示
+  disablePromptHint: true,
+  // 点击新建聊天是否会显示遮罩层
   dontShowMaskSplashScreen: false, // dont show splash screen when create chat
 
   modelConfig: {
     model: "gpt-3.5-turbo-16k-0613" as ModelType,
+    // 随机性
     temperature: 0.2,
+    // 单次回复最大Token数量
     max_tokens: 2000,
-    presence_penalty: 0,
+    // 话题新鲜度0-2.0，值越大扯新话题的概率越大
+    presence_penalty: 1.6,
     sendMemory: true,
+    // 附带历史消息的最大数量
     historyMessageCount: 4,
+    // 历史消息长度压缩阈值，超过该阈值的历史消息将被压缩
     compressMessageLengthThreshold: 1000,
   },
 };

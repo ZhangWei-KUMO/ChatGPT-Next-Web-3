@@ -1,8 +1,8 @@
 @mixin container {
   background-color: var(--white);
-  border: var(--border-in-light);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
+  // border: var(--border-in-light);
+  // border-radius: 20px;
+  // box-shadow: var(--shadow);
   color: var(--black);
   background-color: var(--white);
   min-width: 600px;
@@ -42,10 +42,10 @@
   width: var(--sidebar-width);
   box-sizing: border-box;
   padding: 20px;
-  background-color: var(--gray);
+  background-color: var(--yellow);
   display: flex;
   flex-direction: column;
-  box-shadow: inset -2px 0px 2px 0px rgb(0, 0, 0, 0.05);
+  // box-shadow: inset -2px 0px 2px 0px rgb(0, 0, 0, 0.05);
   position: relative;
   transition: width ease 0.05s;
 
@@ -169,7 +169,7 @@
 }
 
 .chat-item-selected {
-  border-color: var(--primary);
+  border-color: var(--yellow);
 }
 
 .chat-item-title {
@@ -278,7 +278,7 @@
       font-size: 24px;
       font-weight: bolder;
       text-align: center;
-      color: var(--primary);
+      color: var(--yellow);
       opacity: 0.6;
     }
   }
@@ -547,7 +547,7 @@
 
     &-selected,
     &:hover {
-      border-color: var(--primary);
+      border-color: var(--yellow);
     }
   }
 }
@@ -572,11 +572,11 @@
 }
 
 .chat-input:focus {
-  border: 1px solid var(--primary);
+  border: 1px solid var(--yellow);
 }
 
 .chat-input-send {
-  background-color: var(--primary);
+  background-color: var(--yellow);
   color: white;
 
   position: absolute;
