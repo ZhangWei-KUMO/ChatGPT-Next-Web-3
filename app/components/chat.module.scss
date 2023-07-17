@@ -8,7 +8,7 @@
     display: inline-flex;
     border-radius: 20px;
     font-size: 12px;
-    background-color: var(--white);
+    background-color: var(--pink);
     color: var(--black);
     border: var(--border-in-light);
     padding: 4px 10px;
@@ -157,13 +157,13 @@
   }
 
   &-revert-btn {
-    color: var(--yellow);
+    color: var(--pink);
     @include hide;
   }
 
   &:hover {
     opacity: 1;
-    border-color: var(--yellow);
+    border-color: var(--pink);
 
     .clear-context-tips {
       @include hide;

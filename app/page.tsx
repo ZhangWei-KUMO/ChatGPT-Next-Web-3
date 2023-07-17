@@ -11,7 +11,7 @@ export default async function App() {
   return (
     <>
       <div className="logo">
-        <Image src="/relai-logo.png" alt="avatar" width={350} height={200} />
+        <Image src="/relai-logo.png" alt="avatar" width={150} height={100} />
       </div>
       <Home />
       {serverConfig?.isVercel && <Analytics />}

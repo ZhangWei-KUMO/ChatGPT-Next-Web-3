@@ -675,16 +675,16 @@ export function Chat() {
   return (
     <div className={styles.chat} key={session.id}>
       <div className="window-header">
-        <div className="window-header-title">
+        {/* <div className="window-header-title">
           <div
             className={`window-header-main-title " ${styles["chat-body-title"]}`}
           >
-            {/* {!session.topic ? DEFAULT_TOPIC : session.topic} */}
+            {!session.topic ? DEFAULT_TOPIC : session.topic}
           </div>
           <div className="window-header-sub-title">
             {Locale.Chat.SubTitle(session.messages.length)}
           </div>
-        </div>
+        </div> */}
         <div className="window-actions">
           <div className={"window-action-button" + " " + styles.mobile}>
             <IconButton
@@ -769,9 +769,7 @@ export function Chat() {
                 }
               >
                 <div className={styles["chat-message-container"]}>
-                  {/* <div className={styles["chat-message-avatar"]}> */}
-                  {message.role === "user" ? (
-                    // <Avatar avatar={config.avatar} />
+                  {/* {message.role === "user" ? (
                     <Image
                       src="/user-avatar.png"
                       alt="avatar"
@@ -788,8 +786,7 @@ export function Chat() {
                       width={50}
                       height={50}
                     />
-                    // <MaskAvatar mask={session.mask} />
-                  )}
+                  )} */}
                   {/* </div> */}
                   {showTyping && message.role !== "user" && (
                     <div className={styles["chat-message-status"]}>

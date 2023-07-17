@@ -1,10 +1,9 @@
 @mixin container {
-  background-color: var(--white);
+  background-color: var(--pink);
   // border: var(--border-in-light);
   // border-radius: 20px;
   // box-shadow: var(--shadow);
   color: var(--black);
-  background-color: var(--white);
   min-width: 600px;
   min-height: 480px;
   max-width: 1200px;
@@ -25,7 +24,7 @@
   .tight-container {
     --window-width: 100vw;
     --window-height: var(--full-height);
-    --window-content-width: calc(100% - var(--sidebar-width));
+    // --window-content-width: calc(100% - var(--sidebar-width));
 
     @include container();
 
@@ -36,13 +35,13 @@
     border: 0;
   }
 }
-
+// 侧边栏央视
 .sidebar {
   top: 0;
   width: var(--sidebar-width);
   box-sizing: border-box;
-  padding: 20px;
-  background-color: var(--yellow);
+  padding: 10px;
+  background-color: var(--pink);
   display: flex;
   flex-direction: column;
   // box-shadow: inset -2px 0px 2px 0px rgb(0, 0, 0, 0.05);
@@ -83,7 +82,7 @@
 }
 
 .window-content {
-  width: var(--window-content-width);
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -169,7 +168,7 @@
 }
 
 .chat-item-selected {
-  border-color: var(--yellow);
+  border-color: var(--pink);
 }
 
 .chat-item-title {
@@ -278,7 +277,7 @@
       font-size: 24px;
       font-weight: bolder;
       text-align: center;
-      color: var(--yellow);
+      color: var(--pink);
       opacity: 0.6;
     }
   }
@@ -395,7 +394,7 @@
   max-width: 100%;
   margin-top: 10px;
   border-radius: 10px;
-  background-color: var(--second);
+  background-color: var(--deeppink);
   padding: 10px;
   font-size: 14px;
   user-select: text;
@@ -408,7 +407,7 @@
   max-width: 100%;
   margin-top: 10px;
   border-radius: 10px;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(249, 249, 249);
   padding: 10px;
   font-size: 14px;
   user-select: text;
@@ -420,11 +419,11 @@
   content: "";
   width: 0px;
   height: 0px;
-  border: 10px solid var(--second);
-  border-color: transparent   transparent transparent var(--second);
+  border: 10px solid var(--deeppink);
+  border-color: transparent transparent var(--deeppink) transparent ;
   position: absolute;
-  top: 10px;
-  right: -20px;
+  bottom: 0px;
+  left: -10px;
 }
 
 .chat-message-item-left::before{
@@ -432,10 +431,10 @@
   width: 0px;
   height: 0px;
   border: 10px solid rgba(0, 0, 0, 0.05);
-  border-color:  transparent  rgba(0, 0, 0, 0.05) transparent transparent;
+  border-color:  transparent transparent var(--white) transparent ;
   position: absolute;
-  top: 10px;
-  left: -20px;
+  bottom: 0px;
+  right: -10px;
 }
 
 
@@ -470,7 +469,7 @@
 }
 
 .chat-message-user > .chat-message-container > .chat-message-item {
-  background-color: var(--second);
+  background-color: var(--deeppink);
 }
 
 .chat-message-actions {
@@ -493,10 +492,6 @@
   padding-top: 10px;
   box-sizing: border-box;
   flex-direction: column;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-top: var(--border-in-light);
-  box-shadow: var(--card-shadow);
 }
 
 @mixin single-line {
@@ -547,7 +542,7 @@
 
     &-selected,
     &:hover {
-      border-color: var(--yellow);
+      border-color: var(--pink);
     }
   }
 }
@@ -560,10 +555,9 @@
 .chat-input {
   height: 100%;
   width: 100%;
-  border-radius: 10px;
-  border: var(--border-in-light);
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
-  background-color: var(--white);
+  border: var(--pink);
+  // box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
+  background-color: var(--pink);
   color: var(--black);
   font-family: inherit;
   padding: 10px 90px 10px 14px;
@@ -572,11 +566,11 @@
 }
 
 .chat-input:focus {
-  border: 1px solid var(--yellow);
+  border: 1px solid var(--pink);
 }
 
 .chat-input-send {
-  background-color: var(--yellow);
+  background-color: var(--pink);
   color: white;
 
   position: absolute;

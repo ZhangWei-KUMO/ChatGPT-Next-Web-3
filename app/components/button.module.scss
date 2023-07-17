@@ -1,5 +1,5 @@
 .icon-button {
-  background-color: var(--white);
+  background-color: var(--black);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -20,11 +20,11 @@
   }
 
   &.primary {
-    background-color: var(--yellow);
-    color: white;
+    background-color: var(--deeppink);
+    color: rgb(0, 0, 0);
 
     path {
-      fill: white !important;
+      fill: rgb(99, 83, 83) !important;
     }
   }
 }
@@ -38,7 +38,7 @@
 }
 
 .icon-button:hover {
-  border-color: var(--yellow);
+  border-color: var(--deeppink);
 }
 
 .icon-button-icon {

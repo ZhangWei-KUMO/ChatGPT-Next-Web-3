@@ -20,7 +20,7 @@ export const DEFAULT_CONFIG = {
   theme: Theme.Auto as Theme,
   tightBorder: false,
   sendPreviewBubble: true,
-  sidebarWidth: 300,
+  sidebarWidth: 30,
   // 禁止使用\提示
   disablePromptHint: true,
   // 点击新建聊天是否会显示遮罩层
