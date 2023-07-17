@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  // 生产环境下的域名
+  // assetPrefix:'/bot',
   async rewrites() {
     const ret = [
       {

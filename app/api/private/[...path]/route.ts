@@ -20,10 +20,10 @@ async function handle(
       environment: process.env.PINECONE_ENVIRONMENT || " ",
       apiKey: process.env.PINECONE_API_KEY || " ",
     });
-    const index = pinecone.Index("gpt-test-pdf");
+    const index = pinecone.Index("relai-index");
     const pineconeStore = new PineconeStore(embedder, {
       pineconeIndex: index,
-      namespace: "xxxxx",
+      namespace: "namespace1",
     });
 
     let q = params.path[0];
