@@ -159,7 +159,7 @@ export function Markdown(
     <div
       className="markdown-body"
       style={{
-        fontSize: `${props.fontSize ?? 14}px`,
+        fontSize: `14px`,
         height:
           !inView.current && renderedHeight.current > 0
             ? renderedHeight.current

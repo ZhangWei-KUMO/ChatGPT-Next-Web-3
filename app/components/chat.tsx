@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useDebouncedCallback } from "use-debounce";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
@@ -890,6 +891,11 @@ export function Chat() {
             onSearch("");
           }}
         /> */}
+        <center>
+          <Image src="/dog.png" alt="dog" width={169} height={127} />
+        </center>
+        <img src="/divider.png" alt="divider" width="100%" />
+
         <div className={styles["chat-input-panel-inner"]}>
           <textarea
             ref={inputRef}

@@ -1,9 +1,9 @@
 .window-header {
   padding: 14px 20px;
-  border-bottom: rgba(0, 0, 0, 0.1) 1px solid;
+  height: 100px;
+  // background: linear-gradient(to bottom, rgb(193, 30, 30), rgba(255, 205, 205,0));
   position: relative;
-
-  display: flex;
+  // display: flex;
   justify-content: space-between;
   align-items: center;
 }
@@ -21,6 +21,7 @@
     display: block;
     max-width: 50vw;
   }
+
 
   .window-header-sub-title {
     font-size: 14px;

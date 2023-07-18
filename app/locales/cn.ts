@@ -23,7 +23,7 @@ const cn = {
     Rename: "重命名对话",
     Typing: "正在输入…",
     Input: (submitKey: string) => {
-      var inputHints = `${submitKey} 发送`;
+      var inputHints = `${submitKey} / What do you want to talk about?`;
       if (submitKey === String(SubmitKey.Enter)) {
         inputHints += "";
       }

@@ -5,7 +5,7 @@
   // box-shadow: var(--shadow);
   color: var(--black);
   min-width: 600px;
-  min-height: 480px;
+  min-height: 600px;
   max-width: 1200px;
 
   display: flex;
@@ -335,6 +335,7 @@
   padding-bottom: 40px;
   position: relative;
   overscroll-behavior: none;
+  // background-color: #aaa;
 }
 
 .chat-body-title {
@@ -404,7 +405,7 @@
 
 .chat-message-item-left {
   box-sizing: border-box;
-  max-width: 100%;
+  max-width: 600px;
   margin-top: 10px;
   border-radius: 10px;
   background-color: rgba(249, 249, 249);
@@ -580,7 +581,7 @@
 
 @media only screen and (max-width: 600px) {
   .chat-input {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .chat-input-send {
