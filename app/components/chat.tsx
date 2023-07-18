@@ -823,21 +823,21 @@ export function Chat() {
                             >
                               {Locale.Chat.Actions.Delete}
                             </div>
-                            <div
+                            {/* <div
                               className={styles["chat-message-top-action"]}
                               onClick={() => onResend(message.id ?? i)}
                             >
                               {Locale.Chat.Actions.Retry}
-                            </div>
+                            </div> */}
                           </>
                         )}
 
-                        <div
+                        {/* <div
                           className={styles["chat-message-top-action"]}
                           onClick={() => copyToClipboard(message.content)}
                         >
                           {Locale.Chat.Actions.Copy}
-                        </div>
+                        </div> */}
                       </div>
                     )}
                     <Markdown
@@ -856,13 +856,13 @@ export function Chat() {
                       defaultShow={i >= messages.length - 10}
                     />
                   </div>
-                  {!isUser && !message.preview && (
+                  {/* {!isUser && !message.preview && (
                     <div className={styles["chat-message-actions"]}>
                       <div className={styles["chat-message-action-date"]}>
                         {message.date.toLocaleString()}
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
               {shouldShowClearContextDivider && <ClearContextDivider />}
@@ -910,7 +910,9 @@ export function Chat() {
             autoFocus={autoFocus}
           />
           <IconButton
-            icon={<SendWhiteIcon />}
+            icon={
+              <Image src="/send-icon.png" width={15} height={15} alt="icon" />
+            }
             text={Locale.Chat.Send}
             className={styles["chat-input-send"]}
             type="primary"

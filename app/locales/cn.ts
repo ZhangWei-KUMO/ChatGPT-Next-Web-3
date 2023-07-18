@@ -18,10 +18,10 @@ const cn = {
       Copy: "复制",
       Stop: "停止",
       Retry: "重试",
-      Delete: "删除",
+      Delete: "Delete",
     },
     Rename: "重命名对话",
-    Typing: "正在输入…",
+    Typing: "Typing…",
     Input: (submitKey: string) => {
       var inputHints = `${submitKey} / What do you want to talk about?`;
       if (submitKey === String(SubmitKey.Enter)) {
@@ -29,7 +29,7 @@ const cn = {
       }
       return inputHints;
     },
-    Send: "发送",
+    Send: "Send",
     Config: {
       Reset: "清除记忆",
       SaveAs: "存为面具",
