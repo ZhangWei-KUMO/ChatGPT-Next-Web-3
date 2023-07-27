@@ -29,16 +29,16 @@ export const DEFAULT_CONFIG = {
   modelConfig: {
     model: "gpt-3.5-turbo-16k-0613" as ModelType,
     // 随机性
-    temperature: 0.9,
+    temperature: 0.1,
     // 单次回复最大Token数量
     max_tokens: 2000,
     // 话题新鲜度0-2.0，值越大扯新话题的概率越大
-    presence_penalty: 2,
+    presence_penalty: 0.1,
     sendMemory: true,
     // 附带历史消息的最大数量
     historyMessageCount: 4,
     // 历史消息长度压缩阈值，超过该阈值的历史消息将被压缩
-    compressMessageLengthThreshold: 1000,
+    compressMessageLengthThreshold: 8000,
   },
 };
 
