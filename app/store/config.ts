@@ -27,7 +27,7 @@ export const DEFAULT_CONFIG = {
   dontShowMaskSplashScreen: false, // dont show splash screen when create chat
 
   modelConfig: {
-    model: "gpt-3.5-turbo" as ModelType,
+    model: "gpt-3.5-turbo-16k-0613" as ModelType,
     // 随机性
     temperature: 1.0,
     // 单次回复最大Token数量
@@ -36,7 +36,7 @@ export const DEFAULT_CONFIG = {
     presence_penalty: 1.1,
     sendMemory: true,
     // 附带历史消息的最大数量
-    historyMessageCount: 32,
+    historyMessageCount: 82,
     // 历史消息长度压缩阈值，超过该阈值的历史消息将被压缩
     compressMessageLengthThreshold: 8000,
   },
