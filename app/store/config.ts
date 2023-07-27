@@ -29,11 +29,11 @@ export const DEFAULT_CONFIG = {
   modelConfig: {
     model: "gpt-3.5-turbo" as ModelType,
     // 随机性
-    temperature: 0.1,
+    temperature: 1.0,
     // 单次回复最大Token数量
     max_tokens: 2000,
     // 话题新鲜度0-2.0，值越大扯新话题的概率越大
-    presence_penalty: 0.1,
+    presence_penalty: 1.1,
     sendMemory: true,
     // 附带历史消息的最大数量
     historyMessageCount: 4,
