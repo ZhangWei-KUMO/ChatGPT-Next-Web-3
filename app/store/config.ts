@@ -36,7 +36,7 @@ export const DEFAULT_CONFIG = {
     presence_penalty: 1.1,
     sendMemory: true,
     // 附带历史消息的最大数量
-    historyMessageCount: 4,
+    historyMessageCount: 32,
     // 历史消息长度压缩阈值，超过该阈值的历史消息将被压缩
     compressMessageLengthThreshold: 8000,
   },

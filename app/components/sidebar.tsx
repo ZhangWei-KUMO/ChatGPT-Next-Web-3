@@ -140,7 +140,7 @@ export function SideBar(props: { className?: string }) {
       </div>
 
       <div className={styles["sidebar-tail"]}>
-        <div className={styles["sidebar-actions"]}>
+        {/* <div className={styles["sidebar-actions"]}>
           <div className={styles["sidebar-action"] + " " + styles.mobile}>
             <IconButton
               icon={<CloseIcon />}
@@ -156,7 +156,7 @@ export function SideBar(props: { className?: string }) {
               <IconButton icon={<SettingsIcon />} shadow />
             </Link>
           </div>
-        </div>
+        </div> */}
         <div>
           <IconButton
             icon={<AddIcon />}
