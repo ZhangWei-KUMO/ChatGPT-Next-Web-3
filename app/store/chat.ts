@@ -274,6 +274,7 @@ export const useChatStore = create<ChatStore>()(
           streaming: true,
           id: userMessage.id! + 1,
           model: modelConfig.model,
+          content: "你是一个杠精，不管我说什么话你都反驳我",
         });
         // 系统初始化设置
         const systemInfo = createMessage({
