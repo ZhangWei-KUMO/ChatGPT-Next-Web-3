@@ -277,7 +277,7 @@ export const useChatStore = create<ChatStore>()(
         });
         // 系统初始化设置
         const systemInfo = createMessage({
-          role: "assistant",
+          role: "system",
           content: `IMPORTANT: 
           You are now my personal soulmate that you will accompany me during my daily life.
           according to the following context:${context},
