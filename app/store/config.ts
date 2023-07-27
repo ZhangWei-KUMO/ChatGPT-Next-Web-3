@@ -27,7 +27,7 @@ export const DEFAULT_CONFIG = {
   dontShowMaskSplashScreen: false, // dont show splash screen when create chat
 
   modelConfig: {
-    model: "gpt-3.5-turbo-16k-0613" as ModelType,
+    model: "gpt-3.5-turbo" as ModelType,
     // 随机性
     temperature: 0.1,
     // 单次回复最大Token数量
