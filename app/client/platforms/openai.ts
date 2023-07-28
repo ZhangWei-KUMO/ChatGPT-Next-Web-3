@@ -1,7 +1,12 @@
-import { REQUEST_TIMEOUT_MS } from "@/app/constant";
+import {
+  DEFAULT_API_HOST,
+  DEFAULT_MODELS,
+  OpenaiPath,
+  REQUEST_TIMEOUT_MS,
+} from "@/app/constant";
 import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
 
-import { ChatOptions, getHeaders, LLMApi, LLMUsage } from "../api";
+import { ChatOptions, getHeaders, LLMApi, LLMModel, LLMUsage } from "../api";
 import Locale from "../../locales";
 import {
   EventStreamContentType,
@@ -9,15 +14,28 @@ import {
 } from "@fortaine/fetch-event-source";
 import { prettyObject } from "@/app/utils/format";
 
+export interface OpenAIListModelResponse {
+  object: string;
+  data: Array<{
+    id: string;
+    object: string;
+    root: string;
+  }>;
+}
+
 export class ChatGPTApi implements LLMApi {
-  public ChatPath = "v1/chat/completions";
-  public UsagePath = "dashboard/billing/usage";
-  public SubsPath = "dashboard/billing/subscription";
+  private disableListModels = true;
 
   path(path: string): string {
     let openaiUrl = useAccessStore.getState().openaiUrl;
+    if (openaiUrl.length === 0) {
+      openaiUrl = DEFAULT_API_HOST;
+    }
     if (openaiUrl.endsWith("/")) {
       openaiUrl = openaiUrl.slice(0, openaiUrl.length - 1);
+    }
+    if (!openaiUrl.startsWith("http") && !openaiUrl.startsWith("/api/openai")) {
+      openaiUrl = "https://" + openaiUrl;
     }
     return [openaiUrl, path].join("/");
   }
@@ -25,9 +43,8 @@ export class ChatGPTApi implements LLMApi {
   extractMessage(res: any) {
     return res.choices?.at(0)?.message?.content ?? "";
   }
-  // 发送请求
+
   async chat(options: ChatOptions) {
-    // 将所有的信息列表进行抽取
     const messages = options.messages.map((v) => ({
       role: v.role,
       content: v.content,
@@ -47,6 +64,8 @@ export class ChatGPTApi implements LLMApi {
       model: modelConfig.model,
       temperature: modelConfig.temperature,
       presence_penalty: modelConfig.presence_penalty,
+      frequency_penalty: modelConfig.frequency_penalty,
+      top_p: modelConfig.top_p,
     };
 
     console.log("[Request] openai payload: ", requestPayload);
@@ -56,8 +75,7 @@ export class ChatGPTApi implements LLMApi {
     options.onController?.(controller);
 
     try {
-      // 直接调用的oepnAI的接口 /api/openai/v1/chat/completions
-      const chatPath = this.path(this.ChatPath);
+      const chatPath = this.path(OpenaiPath.ChatPath);
       const chatPayload = {
         method: "POST",
         body: JSON.stringify(requestPayload),
@@ -65,7 +83,7 @@ export class ChatGPTApi implements LLMApi {
         headers: getHeaders(),
       };
 
-      // make a fetch request，
+      // make a fetch request
       const requestTimeoutId = setTimeout(
         () => controller.abort(),
         REQUEST_TIMEOUT_MS,
@@ -83,7 +101,7 @@ export class ChatGPTApi implements LLMApi {
         };
 
         controller.signal.onabort = finish;
-        //
+
         fetchEventSource(chatPath, {
           ...chatPayload,
           async onopen(res) {
@@ -126,7 +144,6 @@ export class ChatGPTApi implements LLMApi {
               return finish();
             }
           },
-          // 监听文本流
           onmessage(msg) {
             if (msg.data === "[DONE]" || finished) {
               return finish();
@@ -176,18 +193,18 @@ export class ChatGPTApi implements LLMApi {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startDate = formatDate(startOfMonth);
     const endDate = formatDate(new Date(Date.now() + ONE_DAY));
-    // 获取当前API KEY的使用情况
+
     const [used, subs] = await Promise.all([
       fetch(
         this.path(
-          `${this.UsagePath}?start_date=${startDate}&end_date=${endDate}`,
+          `${OpenaiPath.UsagePath}?start_date=${startDate}&end_date=${endDate}`,
         ),
         {
           method: "GET",
           headers: getHeaders(),
         },
       ),
-      fetch(this.path(this.SubsPath), {
+      fetch(this.path(OpenaiPath.SubsPath), {
         method: "GET",
         headers: getHeaders(),
       }),
@@ -230,4 +247,31 @@ export class ChatGPTApi implements LLMApi {
       total: total.hard_limit_usd,
     } as LLMUsage;
   }
+
+  async models(): Promise<LLMModel[]> {
+    if (this.disableListModels) {
+      return DEFAULT_MODELS.slice();
+    }
+
+    const res = await fetch(this.path(OpenaiPath.ListModelPath), {
+      method: "GET",
+      headers: {
+        ...getHeaders(),
+      },
+    });
+
+    const resJson = (await res.json()) as OpenAIListModelResponse;
+    const chatModels = resJson.data?.filter((m) => m.id.startsWith("gpt-"));
+    console.log("[Models]", chatModels);
+
+    if (!chatModels) {
+      return [];
+    }
+
+    return chatModels.map((m) => ({
+      name: m.id,
+      available: true,
+    }));
+  }
 }
+export { OpenaiPath };

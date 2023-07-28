@@ -2,17 +2,20 @@ import * as React from "react";
 
 import styles from "./button.module.scss";
 
-// 定义的button
+export type ButtonType = "primary" | "danger" | null;
+
 export function IconButton(props: {
   onClick?: () => void;
   icon?: JSX.Element;
-  type?: "primary" | "danger";
+  type?: ButtonType;
   text?: string;
   bordered?: boolean;
   shadow?: boolean;
   className?: string;
   title?: string;
   disabled?: boolean;
+  tabIndex?: number;
+  autoFocus?: boolean;
 }) {
   return (
     <button
@@ -26,6 +29,8 @@ export function IconButton(props: {
       title={props.title}
       disabled={props.disabled}
       role="button"
+      tabIndex={props.tabIndex}
+      autoFocus={props.autoFocus}
     >
       {props.icon && (
         <div

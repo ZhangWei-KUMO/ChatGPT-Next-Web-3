@@ -1,5 +1,5 @@
 .icon-button {
-  background-color: var(--black);
+  background-color: var(--white);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -20,12 +20,32 @@
   }
 
   &.primary {
-    background-color: var(--deeppink);
-    color: rgb(0, 0, 0);
+    background-color: var(--primary);
+    color: white;
 
     path {
-      fill: rgb(99, 83, 83) !important;
+      fill: white !important;
     }
+  }
+
+  &.danger {
+    color: rgba($color: red, $alpha: 0.8);
+    border-color: rgba($color: red, $alpha: 0.5);
+    background-color: rgba($color: red, $alpha: 0.05);
+
+    &:hover {
+      border-color: red;
+      background-color: rgba($color: red, $alpha: 0.1);
+    }
+
+    path {
+      fill: red !important;
+    }
+  }
+
+  &:hover,
+  &:focus {
+    border-color: var(--primary);
   }
 }
 
@@ -35,10 +55,6 @@
 
 .border {
   border: var(--border-in-light);
-}
-
-.icon-button:hover {
-  border-color: var(--deeppink);
 }
 
 .icon-button-icon {
@@ -56,9 +72,12 @@
 }
 
 .icon-button-text {
-  margin-left: 5px;
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  &:not(:first-child) {
+    margin-left: 5px;
+  }
 }

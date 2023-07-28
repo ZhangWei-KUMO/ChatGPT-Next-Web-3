@@ -9,10 +9,7 @@
   --black: rgb(48, 48, 48);
   --gray: rgb(250, 250, 250);
   --primary: rgb(29, 147, 171);
-  --second: rgb(149, 236, 105);
-  --yellow: #ffd34d;
-  --pink : #FFCDCD;
-  --deeppink : #FDACAD;
+  --second: rgb(231, 248, 255);
   --hover-color: #f3f3f3;
   --bar-color: rgba(0, 0, 0, 0.1);
   --theme-color: var(--gray);
@@ -33,10 +30,7 @@
   --black: rgb(187, 187, 187);
   --gray: rgb(21, 21, 21);
   --primary: rgb(29, 147, 171);
-  --deeppink: rgb(27 38 42);
-  --yellow: #ffd34d;
-  --pink : rgb(255, 129, 144);
-
+  --second: rgb(27 38 42);
   --hover-color: #323232;
 
   --bar-color: rgba(255, 255, 255, 0.1);
@@ -66,7 +60,7 @@
   @include light;
 
   --window-width: 90vw;
-  --window-height: 60vh;
+  --window-height: 90vh;
   --sidebar-width: 300px;
   --window-content-width: calc(100% - var(--sidebar-width));
   --message-max-width: 80%;
@@ -98,13 +92,12 @@ html {
   font-family: "Noto Sans SC", "SF Pro SC", "SF Pro Text", "SF Pro Icons",
     "PingFang SC", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
-// 全局样式
+
 body {
-  background-color: var(--pink);
+  background-color: var(--gray);
   color: var(--black);
   margin: 0;
   padding: 0;
-  margin-top: 0px;
   height: var(--full-height);
   width: 100vw;
   display: flex;
@@ -114,7 +107,7 @@ body {
   touch-action: pan-x pan-y;
 
   @media only screen and (max-width: 600px) {
-    background-color: var(--deeppink);
+    background-color: var(--second);
   }
 }
 
@@ -173,7 +166,7 @@ input[type="checkbox"]:checked::after {
   display: inline-block;
   width: 8px;
   height: 8px;
-  background-color: var(--pink);
+  background-color: var(--primary);
   content: " ";
   border-radius: 2px;
 }
@@ -188,7 +181,7 @@ input[type="range"] {
   appearance: none;
   height: 8px;
   width: 20px;
-  background-color: var(--pink);
+  background-color: var(--primary);
   border-radius: 10px;
   cursor: pointer;
   transition: all ease 0.3s;
@@ -263,7 +256,7 @@ div.math {
 
 .link {
   font-size: 12px;
-  color: var(--pink);
+  color: var(--primary);
   text-decoration: none;
 
   &:hover {
@@ -311,6 +304,9 @@ pre {
   &:hover {
     filter: brightness(0.9);
   }
+  &:focus {
+    filter: brightness(0.95);
+  }
 }
 
 .error {
@@ -343,29 +339,20 @@ pre {
 }
 
 .user-avatar {
-  height: 50px;
-  min-height: 50px;
-  width: 50px;
-  min-width: 50px;
+  height: 30px;
+  min-height: 30px;
+  width: 30px;
+  min-width: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: var(--border-in-light);
   box-shadow: var(--card-shadow);
   border-radius: 10px;
-  float: left;
 }
 
 .one-line {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.logo {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
 }

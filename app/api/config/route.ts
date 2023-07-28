@@ -9,8 +9,10 @@ const serverConfig = getServerSideConfig();
 const DANGER_CONFIG = {
   needCode: serverConfig.needCode,
   hideUserApiKey: serverConfig.hideUserApiKey,
-  enableGPT4: serverConfig.enableGPT4,
+  disableGPT4: serverConfig.disableGPT4,
+  hideBalanceQuery: serverConfig.hideBalanceQuery,
 };
+
 declare global {
   type DangerConfig = typeof DANGER_CONFIG;
 }

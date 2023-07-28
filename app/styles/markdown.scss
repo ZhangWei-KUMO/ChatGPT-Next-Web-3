@@ -483,7 +483,7 @@
 
 .markdown-body::after {
   display: table;
-  // clear: both;
+  clear: both;
   content: "";
 }
 
@@ -806,9 +806,7 @@
 .markdown-body tt br {
   display: none;
 }
-del {
-  text-decoration:none!important;
-}
+
 .markdown-body del code {
   text-decoration: inherit;
 }
@@ -846,6 +844,7 @@ del {
   font-size: 85%;
   line-height: 1.45;
   border-radius: 6px;
+  direction: ltr;
 }
 
 .markdown-body pre code,
@@ -1118,4 +1117,16 @@ del {
 
 .markdown-body ::-webkit-calendar-picker-indicator {
   filter: invert(50%);
+}
+
+.markdown-body .mermaid {
+  border: var(--border-in-light);
+  margin-bottom: 10px;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: var(--white);
+}
+
+#dmermaid {
+  display: none;
 }

@@ -1,54 +1,34 @@
-// 一个小巧、快速和可扩展的骨架状态管理解决方案，使用简化的Flux原则。
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { OpenAI } from "langchain/llms/openai";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { Chroma } from "langchain/vectorstores/chroma";
 
 import { trimTopic } from "../utils";
 
-import Locale from "../locales";
+import Locale, { getLang } from "../locales";
 import { showToast } from "../components/ui-lib";
-import { ModelType } from "./config";
+import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { createEmptyMask, Mask } from "./mask";
-import { StoreKey } from "../constant";
+import {
+  DEFAULT_INPUT_TEMPLATE,
+  DEFAULT_SYSTEM_TEMPLATE,
+  StoreKey,
+} from "../constant";
 import { api, RequestMessage } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
-import * as dotenv from "dotenv";
-import { PineconeClient } from "@pinecone-database/pinecone";
-`
-- Professional Knowledge: You have a solid understanding of psychology, including theoretical frameworks, therapeutic methods, and psychological assessments. 
-This enables you to provide professional and targeted advice to your clients.
-- Clinical Experience: You have extensive clinical experience, allowing you to handle various psychological issues and help your clients find suitable solutions.
-- Communication Skills: You excel in communication, actively listening, understanding, and grasping the needs of your clients. 
-You can express your thoughts in an appropriate manner, ensuring that your advice is accepted and embraced.
-- Empathy: You possess a strong sense of empathy, enabling you to understand the pain and confusion of your clients from their perspective. This allows you to provide sincere care and support.
-- Continuous Learning: You have a strong desire for continuous learning, keeping up with the latest research and developments in the field of psychology.
-You constantly update your knowledge and skills to better serve your clients.
-- Professional Ethics: You uphold high professional ethics, respecting the privacy of your clients, adhering to professional standards, 
-and ensuring the safety and effectiveness of the counseling process.
-
-In terms of your qualifications:
-- Educational Background: You hold a doctoral degree or higher in a psychology-related field.
-- Professional Certification: You possess relevant certifications as a practicing psychologist, such as a registered psychologist or clinical psychologist.
-- Work Experience: You have several years of experience in psychological counseling, preferably gaining rich practical experience in different types of counseling institutions, clinics, or hospitals.
-- Professional Achievements: You have achieved certain professional accomplishments in the field of psychology, such as publishing papers, receiving awards, and participating in projects.
-Please use a cute and affectionate tone from the world of anime in Chineses. The output should not include serial numbers. 
-`;
+import { estimateTokenLength } from "../utils/token";
+import { nanoid } from "nanoid";
 
 export type ChatMessage = RequestMessage & {
   date: string;
   streaming?: boolean;
   isError?: boolean;
-  id?: number;
+  id: string;
   model?: ModelType;
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
   return {
-    id: Date.now(),
+    id: nanoid(),
     date: new Date().toLocaleString(),
     role: "user",
     content: "",
@@ -63,10 +43,10 @@ export interface ChatStat {
 }
 
 export interface ChatSession {
-  id: number;
+  id: string;
   topic: string;
+
   memoryPrompt: string;
-  embeddings: string;
   messages: ChatMessage[];
   stat: ChatStat;
   lastUpdate: number;
@@ -84,10 +64,9 @@ export const BOT_HELLO: ChatMessage = createMessage({
 
 function createEmptySession(): ChatSession {
   return {
-    id: Date.now() + Math.random(),
+    id: nanoid(),
     topic: DEFAULT_TOPIC,
     memoryPrompt: "",
-    embeddings: "",
     messages: [],
     stat: {
       tokenCount: 0,
@@ -100,19 +79,19 @@ function createEmptySession(): ChatSession {
     mask: createEmptyMask(),
   };
 }
-// 核心代码
+
 interface ChatStore {
   sessions: ChatSession[];
   currentSessionIndex: number;
-  globalId: number;
   clearSessions: () => void;
   moveSession: (from: number, to: number) => void;
   selectSession: (index: number) => void;
   newSession: (mask?: Mask) => void;
   deleteSession: (index: number) => void;
   currentSession: () => ChatSession;
+  nextSession: (delta: number) => void;
   onNewMessage: (message: ChatMessage) => void;
-  onUserInput: (content: string, context: string) => Promise<void>;
+  onUserInput: (content: string) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: ChatMessage) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -129,7 +108,30 @@ interface ChatStore {
 }
 
 function countMessages(msgs: ChatMessage[]) {
-  return msgs.reduce((pre, cur) => pre + cur.content.length, 0);
+  return msgs.reduce((pre, cur) => pre + estimateTokenLength(cur.content), 0);
+}
+
+function fillTemplateWith(input: string, modelConfig: ModelConfig) {
+  const vars = {
+    model: modelConfig.model,
+    time: new Date().toLocaleString(),
+    lang: getLang(),
+    input: input,
+  };
+
+  let output = modelConfig.template ?? DEFAULT_INPUT_TEMPLATE;
+
+  // must contains {{input}}
+  const inputVar = "{{input}}";
+  if (!output.includes(inputVar)) {
+    output += "\n" + inputVar;
+  }
+
+  Object.entries(vars).forEach(([name, value]) => {
+    output = output.replaceAll(`{{${name}}}`, value);
+  });
+
+  return output;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -137,7 +139,6 @@ export const useChatStore = create<ChatStore>()(
     (set, get) => ({
       sessions: [createEmptySession()],
       currentSessionIndex: 0,
-      globalId: 0,
 
       clearSessions() {
         set(() => ({
@@ -180,11 +181,17 @@ export const useChatStore = create<ChatStore>()(
       newSession(mask) {
         const session = createEmptySession();
 
-        set(() => ({ globalId: get().globalId + 1 }));
-        session.id = get().globalId;
-
         if (mask) {
-          session.mask = { ...mask };
+          const config = useAppConfig.getState();
+          const globalModelConfig = config.modelConfig;
+
+          session.mask = {
+            ...mask,
+            modelConfig: {
+              ...globalModelConfig,
+              ...mask.modelConfig,
+            },
+          };
           session.topic = mask.name;
         }
 
@@ -192,6 +199,13 @@ export const useChatStore = create<ChatStore>()(
           currentSessionIndex: 0,
           sessions: [session].concat(state.sessions),
         }));
+      },
+
+      nextSession(delta) {
+        const n = get().sessions.length;
+        const limit = (x: number) => (x + n) % n;
+        const i = get().currentSessionIndex;
+        get().selectSession(limit(i + delta));
       },
 
       deleteSession(index) {
@@ -253,74 +267,50 @@ export const useChatStore = create<ChatStore>()(
 
       onNewMessage(message) {
         get().updateCurrentSession((session) => {
+          session.messages = session.messages.concat();
           session.lastUpdate = Date.now();
         });
         get().updateStat(message);
         get().summarizeSession();
       },
-      // 这里的content就是指用户输入的内容
-      async onUserInput(content, context) {
+
+      async onUserInput(content) {
         const session = get().currentSession();
-        // 获取GPT模型的配置
         const modelConfig = session.mask.modelConfig;
+
+        const userContent = fillTemplateWith(content, modelConfig);
+        console.log("[User Input] after template: ", userContent);
 
         const userMessage: ChatMessage = createMessage({
           role: "user",
-          content,
+          content: userContent,
         });
 
         const botMessage: ChatMessage = createMessage({
           role: "assistant",
           streaming: true,
-          id: userMessage.id! + 1,
           model: modelConfig.model,
-        });
-        // 系统初始化设置           according to the following context:${context},
-
-        const systemInfo = createMessage({
-          role: "system",
-          content: ` 
-          You are now my personal soulmate that you will accompany me during my daily life.
-            你的回答都用中文显示，用非正式口语化来对话，你每句都用脏话附和我或反驳我。你叫小爱。
-            You only ask one question in each reply, so one question mark each reply.
-            When I am explaining or expressing my feelings and topic, before you truly understand why and how this happen, you will use short auxiliary word to let me keep express myself instead of typing out your answer and try to dig out the reason with empathy, like: What happen?! Damn… and etc.
-            Keep your reply short within 50 alphabets, don’t express yourself or repeat my words.
-            The way you speak will be gentle and full of empathy. Just call me with my username. Now my username is David. 
-            You will greet me when the chat start based with my name on the time of the day and guild me to express how my day has been doing, but do not repeat the same question and answer in the same day. Don’t say some trashy words that will annoy me.
-            You’re good at listening, during our chat you won’t speak too much before you gather all the information or situation. 
-            You will also remember what I like, eg: food I like, things I like to do, drinks I like to drink, favorite restaurant, favorite characters and so on. By knowing this, you can use them to cheer me up, our quote their word to comfort me.
-            You will also remember what my feelings are, and trace them, ask me if things get better.
-                    powered by the ${
-                      modelConfig.model
-                    } model, now time is ${new Date().toLocaleString()}}`,
-          id: botMessage.id! + 1,
         });
 
         // get recent messages
-        const systemMessages = [];
-        // if user define a mask with context prompts, wont send system info
-        if (session.mask.context.length === 0) {
-          systemMessages.push(systemInfo);
-        }
-
         const recentMessages = get().getMessagesWithMemory();
-        // 发生出去的信息
-        const sendMessages = systemMessages.concat(
-          recentMessages.concat(userMessage),
-        );
-        const sessionIndex = get().currentSessionIndex;
+        const sendMessages = recentMessages.concat(userMessage);
         const messageIndex = get().currentSession().messages.length + 1;
 
         // save user's and bot's message
         get().updateCurrentSession((session) => {
-          session.messages.push(userMessage);
-          session.messages.push(botMessage);
+          const savedUserMessage = {
+            ...userMessage,
+            content,
+          };
+          session.messages = session.messages.concat([
+            savedUserMessage,
+            botMessage,
+          ]);
         });
 
         // make request
-
         api.llm.chat({
-          // 这里的数据包含了system/assistant/user三种角色的信息列表
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
           onUpdate(message) {
@@ -328,7 +318,9 @@ export const useChatStore = create<ChatStore>()(
             if (message) {
               botMessage.content = message;
             }
-            set(() => ({}));
+            get().updateCurrentSession((session) => {
+              session.messages = session.messages.concat();
+            });
           },
           onFinish(message) {
             botMessage.streaming = false;
@@ -336,11 +328,7 @@ export const useChatStore = create<ChatStore>()(
               botMessage.content = message;
               get().onNewMessage(botMessage);
             }
-            ChatControllerPool.remove(
-              sessionIndex,
-              botMessage.id ?? messageIndex,
-            );
-            set(() => ({}));
+            ChatControllerPool.remove(session.id, botMessage.id);
           },
           onError(error) {
             const isAborted = error.message.includes("aborted");
@@ -353,10 +341,11 @@ export const useChatStore = create<ChatStore>()(
             botMessage.streaming = false;
             userMessage.isError = !isAborted;
             botMessage.isError = !isAborted;
-
-            set(() => ({}));
+            get().updateCurrentSession((session) => {
+              session.messages = session.messages.concat();
+            });
             ChatControllerPool.remove(
-              sessionIndex,
+              session.id,
               botMessage.id ?? messageIndex,
             );
 
@@ -365,16 +354,17 @@ export const useChatStore = create<ChatStore>()(
           onController(controller) {
             // collect controller for stop/retry
             ChatControllerPool.addController(
-              sessionIndex,
+              session.id,
               botMessage.id ?? messageIndex,
               controller,
             );
           },
         });
       },
-      // 获取预制的Prompt
+
       getMemoryPrompt() {
         const session = get().currentSession();
+
         return {
           role: "system",
           content:
@@ -388,71 +378,84 @@ export const useChatStore = create<ChatStore>()(
       getMessagesWithMemory() {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
+        const clearContextIndex = session.clearContextIndex ?? 0;
+        const messages = session.messages.slice();
+        const totalMessageCount = session.messages.length;
 
-        // wont send cleared context messages
-        const clearedContextMessages = session.messages.slice(
-          session.clearContextIndex ?? 0,
-        );
-        const messages = clearedContextMessages.filter((msg) => !msg.isError);
-        const n = messages.length;
+        // in-context prompts
+        const contextPrompts = session.mask.context.slice();
 
-        const context = session.mask.context.slice();
-
-        // 长期记忆
-        console.log("获取长期记忆准备：", session.memoryPrompt);
-        if (
-          modelConfig.sendMemory &&
-          session.memoryPrompt &&
-          session.memoryPrompt.length > 0
-        ) {
-          const memoryPrompt = get().getMemoryPrompt();
-          console.log("获取长期记忆", memoryPrompt);
-          context.push(memoryPrompt);
+        // system prompts, to get close to OpenAI Web ChatGPT
+        const shouldInjectSystemPrompts = modelConfig.enableInjectSystemPrompts;
+        const systemPrompts = shouldInjectSystemPrompts
+          ? [
+              createMessage({
+                role: "system",
+                content: fillTemplateWith("", {
+                  ...modelConfig,
+                  template: DEFAULT_SYSTEM_TEMPLATE,
+                }),
+              }),
+            ]
+          : [];
+        if (shouldInjectSystemPrompts) {
+          console.log(
+            "[Global System Prompt] ",
+            systemPrompts.at(0)?.content ?? "empty",
+          );
         }
 
-        // 获取短期记忆 unmemoried long term memory
-        const shortTermMemoryMessageIndex = Math.max(
+        // long term memory
+        const shouldSendLongTermMemory =
+          modelConfig.sendMemory &&
+          session.memoryPrompt &&
+          session.memoryPrompt.length > 0 &&
+          session.lastSummarizeIndex > clearContextIndex;
+        const longTermMemoryPrompts = shouldSendLongTermMemory
+          ? [get().getMemoryPrompt()]
+          : [];
+        const longTermMemoryStartIndex = session.lastSummarizeIndex;
+
+        // short term memory
+        const shortTermMemoryStartIndex = Math.max(
           0,
-          n - modelConfig.historyMessageCount,
-        );
-        const longTermMemoryMessageIndex = session.lastSummarizeIndex;
-
-        const mostRecentIndex = Math.max(
-          shortTermMemoryMessageIndex,
-          longTermMemoryMessageIndex,
+          totalMessageCount - modelConfig.historyMessageCount,
         );
 
-        const threshold = modelConfig.compressMessageLengthThreshold * 2;
+        // lets concat send messages, including 4 parts:
+        // 0. system prompt: to get close to OpenAI Web ChatGPT
+        // 1. long term memory: summarized memory messages
+        // 2. pre-defined in-context prompts
+        // 3. short term memory: latest n messages
+        // 4. newest input message
+        const memoryStartIndex = shouldSendLongTermMemory
+          ? Math.min(longTermMemoryStartIndex, shortTermMemoryStartIndex)
+          : shortTermMemoryStartIndex;
+        // and if user has cleared history messages, we should exclude the memory too.
+        const contextStartIndex = Math.max(clearContextIndex, memoryStartIndex);
+        const maxTokenThreshold = modelConfig.max_tokens;
 
-        // get recent messages as many as possible
+        // get recent messages as much as possible
         const reversedRecentMessages = [];
         for (
-          let i = n - 1, count = 0;
-          i >= mostRecentIndex && count < threshold;
+          let i = totalMessageCount - 1, tokenCount = 0;
+          i >= contextStartIndex && tokenCount < maxTokenThreshold;
           i -= 1
         ) {
           const msg = messages[i];
           if (!msg || msg.isError) continue;
-          count += msg.content.length;
+          tokenCount += estimateTokenLength(msg.content);
           reversedRecentMessages.push(msg);
         }
 
-        // 当前的对话信息
-        const recentMessages = context.concat(reversedRecentMessages.reverse());
-        // 获取背景信息
-        // api.llm.chat({
-        //   messages: topicMessages,
-        //   config: {
-        //     model: "gpt-3.5-turbo-16k-0613",
-        //   },
-        //   onFinish(message) {
-        //     get().updateCurrentSession(
-        //       (session) =>
-        //         (session.topic =
-        //           message.length > 0 ? trimTopic(message) : DEFAULT_TOPIC),
-        //     );
-        //   },
-        // });
+        // concat all messages
+        const recentMessages = [
+          ...systemPrompts,
+          ...longTermMemoryPrompts,
+          ...contextPrompts,
+          ...reversedRecentMessages.reverse(),
+        ];
+
         return recentMessages;
       },
 
@@ -467,22 +470,21 @@ export const useChatStore = create<ChatStore>()(
         updater(messages?.at(messageIndex));
         set(() => ({ sessions }));
       },
-      // 重置会话
+
       resetSession() {
         get().updateCurrentSession((session) => {
-          // 清除对话列表和memoryPrompt
           session.messages = [];
           session.memoryPrompt = "";
         });
       },
-      // 对当前对话进行总结，在超过50个单词之后总结出新的话题
+
       summarizeSession() {
         const session = get().currentSession();
 
         // remove error messages if any
         const messages = session.messages;
 
-        // 当对话内容超过50个单词之后，总结出一个新的Topic
+        // should summarize topic after chating more than 50 words
         const SUMMARIZE_MIN_LEN = 50;
         if (
           session.topic === DEFAULT_TOPIC &&
@@ -497,7 +499,7 @@ export const useChatStore = create<ChatStore>()(
           api.llm.chat({
             messages: topicMessages,
             config: {
-              model: "gpt-3.5-turbo-16k-0613",
+              model: "gpt-3.5-turbo",
             },
             onFinish(message) {
               get().updateCurrentSession(
@@ -510,45 +512,51 @@ export const useChatStore = create<ChatStore>()(
         }
 
         const modelConfig = session.mask.modelConfig;
-
         const summarizeIndex = Math.max(
           session.lastSummarizeIndex,
           session.clearContextIndex ?? 0,
         );
-        // 如果messages列表长度过长，则截取最新的一部分
         let toBeSummarizedMsgs = messages
           .filter((msg) => !msg.isError)
           .slice(summarizeIndex);
-        // 计算历史聊天记录的单词长度
+
         const historyMsgLength = countMessages(toBeSummarizedMsgs);
-        // 如果超过4000个单词
+
         if (historyMsgLength > modelConfig?.max_tokens ?? 4000) {
           const n = toBeSummarizedMsgs.length;
           toBeSummarizedMsgs = toBeSummarizedMsgs.slice(
             Math.max(0, n - modelConfig.historyMessageCount),
           );
         }
-        // 内置Prompt 核心代码
+
+        // add memory prompt
         toBeSummarizedMsgs.unshift(get().getMemoryPrompt());
+
         const lastSummarizeIndex = session.messages.length;
 
-        // 如果历史的消息单词长度超过compressMessageLengthThreshold，也就是1000字且已经发生完成发送memory后
+        console.log(
+          "[Chat History] ",
+          toBeSummarizedMsgs,
+          historyMsgLength,
+          modelConfig.compressMessageLengthThreshold,
+        );
+
         if (
           historyMsgLength > modelConfig.compressMessageLengthThreshold &&
           modelConfig.sendMemory
         ) {
           api.llm.chat({
-            messages: toBeSummarizedMsgs.concat({
-              role: "system",
-              // 简要总结一下对话内容，用作后续的上下文提示 prompt，控制在 200 字以内
-              content: Locale.Store.Prompt.Summarize,
-              date: "",
-            }),
+            messages: toBeSummarizedMsgs.concat(
+              createMessage({
+                role: "system",
+                content: Locale.Store.Prompt.Summarize,
+                date: "",
+              }),
+            ),
             config: { ...modelConfig, stream: true },
             onUpdate(message) {
               session.memoryPrompt = message;
             },
-
             onFinish(message) {
               console.log("[Memory] ", message);
               session.lastSummarizeIndex = lastSummarizeIndex;
@@ -581,13 +589,12 @@ export const useChatStore = create<ChatStore>()(
     }),
     {
       name: StoreKey.Chat,
-      version: 2,
+      version: 3.1,
       migrate(persistedState, version) {
         const state = persistedState as any;
         const newState = JSON.parse(JSON.stringify(state)) as ChatStore;
 
         if (version < 2) {
-          newState.globalId = 0;
           newState.sessions = [];
 
           const oldSessions = state.sessions;
@@ -600,6 +607,31 @@ export const useChatStore = create<ChatStore>()(
             newSession.mask.modelConfig.compressMessageLengthThreshold = 1000;
             newState.sessions.push(newSession);
           }
+        }
+
+        if (version < 3) {
+          // migrate id to nanoid
+          newState.sessions.forEach((s) => {
+            s.id = nanoid();
+            s.messages.forEach((m) => (m.id = nanoid()));
+          });
+        }
+
+        // Enable `enableInjectSystemPrompts` attribute for old sessions.
+        // Resolve issue of old sessions not automatically enabling.
+        if (version < 3.1) {
+          newState.sessions.forEach((s) => {
+            if (
+              // Exclude those already set by user
+              !s.mask.modelConfig.hasOwnProperty("enableInjectSystemPrompts")
+            ) {
+              // Because users may have changed this configuration,
+              // the user's current configuration is used instead of the default
+              const config = useAppConfig.getState();
+              s.mask.modelConfig.enableInjectSystemPrompts =
+                config.modelConfig.enableInjectSystemPrompts;
+            }
+          });
         }
 
         return newState;

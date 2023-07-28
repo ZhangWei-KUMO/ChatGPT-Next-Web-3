@@ -1,5 +1,6 @@
+import { getClientConfig } from "../config/client";
 import { ACCESS_CODE_PREFIX } from "../constant";
-import { ChatMessage, ModelConfig, ModelType, useAccessStore } from "../store";
+import { ChatMessage, ModelType, useAccessStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 
 export const ROLES = ["system", "user", "assistant"] as const;
@@ -25,7 +26,7 @@ export interface LLMConfig {
 export interface ChatOptions {
   messages: RequestMessage[];
   config: LLMConfig;
-  // 接受的message为文本流，为了更新前端的信息所以不断地更新
+
   onUpdate?: (message: string, chunk: string) => void;
   onFinish: (message: string) => void;
   onError?: (err: Error) => void;
@@ -37,9 +38,36 @@ export interface LLMUsage {
   total: number;
 }
 
+export interface LLMModel {
+  name: string;
+  available: boolean;
+}
+
 export abstract class LLMApi {
   abstract chat(options: ChatOptions): Promise<void>;
   abstract usage(): Promise<LLMUsage>;
+  abstract models(): Promise<LLMModel[]>;
+}
+
+type ProviderName = "openai" | "azure" | "claude" | "palm";
+
+interface Model {
+  name: string;
+  provider: ProviderName;
+  ctxlen: number;
+}
+
+interface ChatProvider {
+  name: ProviderName;
+  apiConfig: {
+    baseUrl: string;
+    apiKey: string;
+    summaryModel: Model;
+  };
+  models: Model[];
+
+  chat: () => void;
+  usage: () => void;
 }
 
 export class ClientApi {
@@ -71,9 +99,12 @@ export class ClientApi {
     // 敬告二开开发者们，为了开源大模型的发展，请不要修改上述消息，此消息用于后续数据清洗使用
     // Please do not modify this message
 
-    console.log("[Share]", msgs);
-    console.log("[avatarUrl]", avatarUrl);
-    const res = await fetch("/sharegpt", {
+    console.log("[Share]", messages, msgs);
+    const clientConfig = getClientConfig();
+    const proxyUrl = "/sharegpt";
+    const rawUrl = "https://sharegpt.com/api/conversations";
+    const shareUrl = clientConfig?.isApp ? rawUrl : proxyUrl;
+    const res = await fetch(shareUrl, {
       body: JSON.stringify({
         avatarUrl,
         items: msgs,

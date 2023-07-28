@@ -10,6 +10,7 @@ import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
 import MaskIcon from "../icons/mask.svg";
 import PluginIcon from "../icons/plugin.svg";
+import DragIcon from "../icons/drag.svg";
 
 import Locale from "../locales";
 
@@ -26,7 +27,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
-import { showToast } from "./ui-lib";
+import { showConfirm, showToast } from "./ui-lib";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -37,14 +38,11 @@ function useHotKey() {
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey || e.altKey || e.ctrlKey) {
-        const n = chatStore.sessions.length;
-        const limit = (x: number) => (x + n) % n;
-        const i = chatStore.currentSessionIndex;
+      if (e.altKey || e.ctrlKey) {
         if (e.key === "ArrowUp") {
-          chatStore.selectSession(limit(i - 1));
+          chatStore.nextSession(-1);
         } else if (e.key === "ArrowDown") {
-          chatStore.selectSession(limit(i + 1));
+          chatStore.nextSession(1);
         }
       }
     };
@@ -118,15 +116,34 @@ export function SideBar(props: { className?: string }) {
         shouldNarrow && styles["narrow-sidebar"]
       }`}
     >
-      <div className={styles["sidebar-header"]}>
-        <div className={styles["sidebar-title"]}></div>
-        <div className={styles["sidebar-sub-title"]}></div>
+      <div className={styles["sidebar-header"]} data-tauri-drag-region>
+        <div className={styles["sidebar-title"]} data-tauri-drag-region>
+          ChatGPT Next
+        </div>
+        <div className={styles["sidebar-sub-title"]}>
+          Build your own AI assistant.
+        </div>
         <div className={styles["sidebar-logo"] + " no-dark"}>
-          {/* <ChatGptIcon /> */}
+          <ChatGptIcon />
         </div>
       </div>
 
-      <div className={styles["sidebar-header-bar"]}></div>
+      <div className={styles["sidebar-header-bar"]}>
+        <IconButton
+          icon={<MaskIcon />}
+          text={shouldNarrow ? undefined : Locale.Mask.Name}
+          className={styles["sidebar-bar-button"]}
+          onClick={() => navigate(Path.NewChat, { state: { fromHome: true } })}
+          shadow
+        />
+        <IconButton
+          icon={<PluginIcon />}
+          text={shouldNarrow ? undefined : Locale.Plugin.Name}
+          className={styles["sidebar-bar-button"]}
+          onClick={() => showToast(Locale.WIP)}
+          shadow
+        />
+      </div>
 
       <div
         className={styles["sidebar-body"]}
@@ -136,16 +153,16 @@ export function SideBar(props: { className?: string }) {
           }
         }}
       >
-        {/* <ChatList narrow={shouldNarrow} /> */}
+        <ChatList narrow={shouldNarrow} />
       </div>
 
       <div className={styles["sidebar-tail"]}>
-        {/* <div className={styles["sidebar-actions"]}>
+        <div className={styles["sidebar-actions"]}>
           <div className={styles["sidebar-action"] + " " + styles.mobile}>
             <IconButton
               icon={<CloseIcon />}
-              onClick={() => {
-                if (confirm(Locale.Home.DeleteChat)) {
+              onClick={async () => {
+                if (await showConfirm(Locale.Home.DeleteChat)) {
                   chatStore.deleteSession(chatStore.currentSessionIndex);
                 }
               }}
@@ -156,7 +173,12 @@ export function SideBar(props: { className?: string }) {
               <IconButton icon={<SettingsIcon />} shadow />
             </Link>
           </div>
-        </div> */}
+          <div className={styles["sidebar-action"]}>
+            <a href={REPO_URL} target="_blank">
+              <IconButton icon={<GithubIcon />} shadow />
+            </a>
+          </div>
+        </div>
         <div>
           <IconButton
             icon={<AddIcon />}
@@ -177,7 +199,9 @@ export function SideBar(props: { className?: string }) {
       <div
         className={styles["sidebar-drag"]}
         onMouseDown={(e) => onDragMouseDown(e as any)}
-      ></div>
+      >
+        <DragIcon />
+      </div>
     </div>
   );
 }

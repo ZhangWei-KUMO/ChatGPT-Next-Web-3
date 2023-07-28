@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Path, SlotID } from "../constant";
 import { IconButton } from "./button";
-import Image from "next/image";
+import { EmojiAvatar } from "./emoji";
 import styles from "./new-chat.module.scss";
 
 import LeftIcon from "../icons/left.svg";
@@ -14,6 +14,8 @@ import Locale from "../locales";
 import { useAppConfig, useChatStore } from "../store";
 import { MaskAvatar } from "./mask";
 import { useCommand } from "../command";
+import { showConfirm } from "./ui-lib";
+import { BUILTIN_MASK_STORE } from "../masks";
 
 function getIntersectionArea(aRect: DOMRect, bRect: DOMRect) {
   const xmin = Math.max(aRect.x, bRect.x);
@@ -76,7 +78,7 @@ function useMaskGroup(masks: Mask[]) {
 
   return groups;
 }
-// 初始化的一个新的聊天
+
 export function NewChat() {
   const chatStore = useChatStore();
   const maskStore = useMaskStore();
@@ -90,17 +92,18 @@ export function NewChat() {
   const maskRef = useRef<HTMLDivElement>(null);
 
   const { state } = useLocation();
-  // 启动默认聊天窗口
+
   const startChat = (mask?: Mask) => {
-    // 将默认数据存储进chatStore
-    chatStore.newSession(mask);
-    setTimeout(() => navigate(Path.Chat), 1);
+    setTimeout(() => {
+      chatStore.newSession(mask);
+      navigate(Path.Chat);
+    }, 10);
   };
 
   useCommand({
     mask: (id) => {
       try {
-        const mask = maskStore.get(parseInt(id));
+        const mask = maskStore.get(id) ?? BUILTIN_MASK_STORE.get(id);
         startChat(mask ?? undefined);
       } catch {
         console.error("[New Chat] failed to create chat from mask id=", id);
@@ -126,8 +129,8 @@ export function NewChat() {
         {!state?.fromHome && (
           <IconButton
             text={Locale.NewChat.NotShow}
-            onClick={() => {
-              if (confirm(Locale.NewChat.ConfirmNoShow)) {
+            onClick={async () => {
+              if (await showConfirm(Locale.NewChat.ConfirmNoShow)) {
                 startChat();
                 config.update(
                   (config) => (config.dontShowMaskSplashScreen = true),
@@ -139,13 +142,13 @@ export function NewChat() {
       </div>
       <div className={styles["mask-cards"]}>
         <div className={styles["mask-card"]}>
-          <Image src="/doctor1.jpeg" alt="doctor1" width={70} height={100} />
+          <EmojiAvatar avatar="1f606" size={24} />
         </div>
         <div className={styles["mask-card"]}>
-          <Image src="/doctor2.jpeg" alt="doctor2" width={70} height={100} />
+          <EmojiAvatar avatar="1f916" size={24} />
         </div>
         <div className={styles["mask-card"]}>
-          <Image src="/doctor4.jpeg" alt="doctor4" width={70} height={100} />
+          <EmojiAvatar avatar="1f479" size={24} />
         </div>
       </div>
 
