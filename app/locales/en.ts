@@ -62,12 +62,8 @@ const en: LocaleType = {
     },
     Rename: "Rename Chat",
     Typing: "Typing…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} to send`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += ", Shift + Enter to wrap";
-      }
-      return inputHints + ", / to search prompts, : to use commands";
+    Input: () => {
+      return "What do you want to talk about?";
     },
     Send: "Send",
     Config: {
