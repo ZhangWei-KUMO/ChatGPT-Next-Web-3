@@ -1012,11 +1012,11 @@ export function Chat() {
           </div> */}
         </div>
 
-        <PromptToast
+        {/* <PromptToast
           showToast={!hitBottom}
           showModal={showPromptModal}
           setShowModal={setShowPromptModal}
-        />
+        /> */}
       </div>
 
       <div
@@ -1089,11 +1089,11 @@ export function Chat() {
                             />
                           ) : (
                             <>
-                              <ChatAction
+                              {/* <ChatAction
                                 text={Locale.Chat.Actions.Retry}
                                 icon={<ResetIcon />}
                                 onClick={() => onResend(message)}
-                              />
+                              /> */}
 
                               <ChatAction
                                 text={Locale.Chat.Actions.Delete}
@@ -1101,7 +1101,7 @@ export function Chat() {
                                 onClick={() => onDelete(message.id ?? i)}
                               />
 
-                              <ChatAction
+                              {/* <ChatAction
                                 text={Locale.Chat.Actions.Pin}
                                 icon={<PinIcon />}
                                 onClick={() => onPinMessage(message)}
@@ -1110,18 +1110,18 @@ export function Chat() {
                                 text={Locale.Chat.Actions.Copy}
                                 icon={<CopyIcon />}
                                 onClick={() => copyToClipboard(message.content)}
-                              />
+                              /> */}
                             </>
                           )}
                         </div>
                       </div>
                     )}
                   </div>
-                  {showTyping && (
+                  {/* {showTyping && (
                     <div className={styles["chat-message-status"]}>
                       {Locale.Chat.Typing}
                     </div>
-                  )}
+                  )} */}
                   <div className={styles["chat-message-item"]}>
                     <Markdown
                       content={message.content}
@@ -1140,11 +1140,11 @@ export function Chat() {
                     />
                   </div>
 
-                  <div className={styles["chat-message-action-date"]}>
+                  {/* <div className={styles["chat-message-action-date"]}>
                     {isContext
                       ? Locale.Chat.IsContext
                       : message.date.toLocaleString()}
-                  </div>
+                  </div> */}
                 </div>
               </div>
               {shouldShowClearContextDivider && <ClearContextDivider />}

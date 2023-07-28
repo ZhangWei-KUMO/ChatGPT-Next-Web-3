@@ -333,3 +333,51 @@
 .rtl-screen {
   direction: rtl;
 }
+
+// .chat-message-right {
+//   box-sizing: border-box;
+//   max-width: 100%;
+//   margin-top: 10px;
+//   border-radius: 10px;
+//   background-color: var(--deeppink);
+//   padding: 10px;
+//   font-size: 14px;
+//   user-select: text;
+//   word-break: break-word;
+//   position: relative;
+// }
+
+// .chat-message-item {
+//   box-sizing: border-box;
+//   max-width: 600px;
+//   margin-top: 10px;
+//   border-radius: 10px;
+//   background-color: rgba(249, 249, 249);
+//   padding: 10px;
+//   font-size: 14px;
+//   user-select: text;
+//   word-break: break-word;
+//   position: relative;
+// }
+
+// .chat-message-right::before{
+//   content: "";
+//   width: 0px;
+//   height: 0px;
+//   border: 10px solid var(--deeppink);
+//   border-color: transparent transparent var(--deeppink) transparent ;
+//   position: absolute;
+//   bottom: 0px;
+//   left: -10px;
+// }
+
+// .chat-message-item::before{
+//   content: "";
+//   width: 0px;
+//   height: 0px;
+//   border: 10px solid rgba(0, 0, 0, 0.05);
+//   border-color:  transparent transparent var(--white) transparent ;
+//   position: absolute;
+//   bottom: 0px;
+//   right: -10px;
+// }

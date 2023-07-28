@@ -8,7 +8,7 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "ChatGPT Next Web",
+    "productName": "RelAI",
     "version": "2.9.1"
   },
   "tauri": {
@@ -71,7 +71,7 @@
         "signingIdentity": null
       },
       "resources": [],
-      "shortDescription": "ChatGPT Next Web App",
+      "shortDescription": "RelAI",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
@@ -98,7 +98,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "ChatGPT Next Web",
+        "title": "RelAI",
         "width": 960,
         "hiddenTitle": true,
         "titleBarStyle": "Overlay"
