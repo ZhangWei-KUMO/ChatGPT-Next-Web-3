@@ -66,7 +66,7 @@
       }
 
       &-current {
-        color: var(--primary);
+        color: var(--deeppink);
       }
 
       .step-index {
@@ -153,13 +153,13 @@
           font-size: 12px;
           margin: 0 10px;
           font-weight: bolder;
-          color: var(--primary);
+          color: var(--deeppink);
         }
       }
 
       .chat-info-item {
         font-size: 12px;
-        color: var(--primary);
+        color: var(--deeppink);
         padding: 2px 15px;
         border-radius: 10px;
         background-color: var(--white);

@@ -120,46 +120,11 @@ export function NewChat() {
 
   return (
     <div className={styles["new-chat"]}>
-      <div className={styles["mask-header"]}>
-        <IconButton
-          icon={<LeftIcon />}
-          text={Locale.NewChat.Return}
-          onClick={() => navigate(Path.Home)}
-        ></IconButton>
-        {!state?.fromHome && (
-          <IconButton
-            text={Locale.NewChat.NotShow}
-            onClick={async () => {
-              if (await showConfirm(Locale.NewChat.ConfirmNoShow)) {
-                startChat();
-                config.update(
-                  (config) => (config.dontShowMaskSplashScreen = true),
-                );
-              }
-            }}
-          ></IconButton>
-        )}
-      </div>
-      <div className={styles["mask-cards"]}>
-        <div className={styles["mask-card"]}>
-          <EmojiAvatar avatar="1f606" size={24} />
-        </div>
-        <div className={styles["mask-card"]}>
-          <EmojiAvatar avatar="1f916" size={24} />
-        </div>
-        <div className={styles["mask-card"]}>
-          <EmojiAvatar avatar="1f479" size={24} />
-        </div>
-      </div>
-
-      <div className={styles["title"]}>{Locale.NewChat.Title}</div>
-      <div className={styles["sub-title"]}>{Locale.NewChat.SubTitle}</div>
-
       <div className={styles["actions"]}>
         <IconButton
-          text={Locale.NewChat.More}
-          onClick={() => navigate(Path.Masks)}
-          icon={<EyeIcon />}
+          text={Locale.NewChat.Return}
+          onClick={() => navigate(Path.Home)}
+          icon={<LeftIcon />}
           bordered
           shadow
         />
@@ -172,20 +137,6 @@ export function NewChat() {
           shadow
           className={styles["skip"]}
         />
-      </div>
-
-      <div className={styles["masks"]} ref={maskRef}>
-        {groups.map((masks, i) => (
-          <div key={i} className={styles["mask-row"]}>
-            {masks.map((mask, index) => (
-              <MaskItem
-                key={index}
-                mask={mask}
-                onClick={() => startChat(mask)}
-              />
-            ))}
-          </div>
-        ))}
       </div>
     </div>
   );

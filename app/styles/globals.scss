@@ -13,7 +13,8 @@
   --hover-color: #f3f3f3;
   --bar-color: rgba(0, 0, 0, 0.1);
   --theme-color: var(--gray);
-
+  --pink : #FFCDCD;
+  --deeppink : #FDACAD;
   /* shadow */
   --shadow: 50px 50px 100px 10px rgb(0, 0, 0, 0.1);
   --card-shadow: 0px 2px 4px 0px rgb(0, 0, 0, 0.05);
@@ -32,7 +33,8 @@
   --primary: rgb(29, 147, 171);
   --second: rgb(27 38 42);
   --hover-color: #323232;
-
+  --pink : #FFCDCD;
+  --deeppink : #FDACAD;
   --bar-color: rgba(255, 255, 255, 0.1);
 
   --border-in-light: 1px solid rgba(255, 255, 255, 0.192);
@@ -94,7 +96,7 @@ html {
 }
 
 body {
-  background-color: var(--gray);
+  background-color: var(--pink);
   color: var(--black);
   margin: 0;
   padding: 0;
@@ -166,7 +168,7 @@ input[type="checkbox"]:checked::after {
   display: inline-block;
   width: 8px;
   height: 8px;
-  background-color: var(--primary);
+  background-color: var(--deeppink);
   content: " ";
   border-radius: 2px;
 }
@@ -181,7 +183,7 @@ input[type="range"] {
   appearance: none;
   height: 8px;
   width: 20px;
-  background-color: var(--primary);
+  background-color: var(--deeppink);
   border-radius: 10px;
   cursor: pointer;
   transition: all ease 0.3s;
@@ -256,7 +258,7 @@ div.math {
 
 .link {
   font-size: 12px;
-  color: var(--primary);
+  color: var(--deeppink);
   text-decoration: none;
 
   &:hover {

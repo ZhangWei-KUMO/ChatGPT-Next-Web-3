@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useDebouncedCallback } from "use-debounce";
 import React, {
   useState,
@@ -7,7 +8,7 @@ import React, {
   useCallback,
   Fragment,
 } from "react";
-
+import Image from "next/image";
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
@@ -27,6 +28,7 @@ import PinIcon from "../icons/pin.svg";
 import EditIcon from "../icons/rename.svg";
 import ConfirmIcon from "../icons/confirm.svg";
 import CancelIcon from "../icons/cancel.svg";
+import { Link } from "react-router-dom";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -964,6 +966,7 @@ export function Chat() {
   return (
     <div className={styles.chat} key={session.id}>
       <div className="window-header" data-tauri-drag-region>
+        <div className="overlay"></div>
         {isMobileScreen && (
           <div className="window-actions">
             <div className={"window-action-button"}>
@@ -978,7 +981,14 @@ export function Chat() {
         )}
 
         <div className={`window-header-title ${styles["chat-body-title"]}`}>
-          <div
+          <Image
+            src="/relai-logo.png"
+            alt="avatar"
+            width={124}
+            height={85}
+            onClick={() => setIsEditingMessage(true)}
+          />
+          {/* <div
             className={`window-header-main-title ${styles["chat-body-main-title"]}`}
             onClickCapture={() => setIsEditingMessage(true)}
           >
@@ -986,19 +996,11 @@ export function Chat() {
           </div>
           <div className="window-header-sub-title">
             {Locale.Chat.SubTitle(session.messages.length)}
-          </div>
+          </div> */}
         </div>
         <div className="window-actions">
-          {!isMobileScreen && (
-            <div className="window-action-button">
-              <IconButton
-                icon={<RenameIcon />}
-                bordered
-                onClick={() => setIsEditingMessage(true)}
-              />
-            </div>
-          )}
-          <div className="window-action-button">
+          {/* 导出聊天记录 */}
+          {/* <div className="window-action-button">
             <IconButton
               icon={<ExportIcon />}
               bordered
@@ -1007,20 +1009,7 @@ export function Chat() {
                 setShowExport(true);
               }}
             />
-          </div>
-          {showMaxIcon && (
-            <div className="window-action-button">
-              <IconButton
-                icon={config.tightBorder ? <MinIcon /> : <MaxIcon />}
-                bordered
-                onClick={() => {
-                  config.update(
-                    (config) => (config.tightBorder = !config.tightBorder),
-                  );
-                }}
-              />
-            </div>
-          )}
+          </div> */}
         </div>
 
         <PromptToast
@@ -1061,7 +1050,7 @@ export function Chat() {
               >
                 <div className={styles["chat-message-container"]}>
                   <div className={styles["chat-message-header"]}>
-                    <div className={styles["chat-message-avatar"]}>
+                    {/* <div className={styles["chat-message-avatar"]}>
                       <div className={styles["chat-message-edit"]}>
                         <IconButton
                           icon={<EditIcon />}
@@ -1087,7 +1076,7 @@ export function Chat() {
                       ) : (
                         <MaskAvatar mask={session.mask} />
                       )}
-                    </div>
+                    </div> */}
 
                     {showActions && (
                       <div className={styles["chat-message-actions"]}>
@@ -1165,9 +1154,9 @@ export function Chat() {
       </div>
 
       <div className={styles["chat-input-panel"]}>
-        <PromptHints prompts={promptHints} onPromptSelect={onPromptSelect} />
-
-        <ChatActions
+        {/* <PromptHints prompts={promptHints} onPromptSelect={onPromptSelect} /> */}
+        {/* 聊天工具栏 */}
+        {/* <ChatActions
           showPromptModal={() => setShowPromptModal(true)}
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
@@ -1182,12 +1171,31 @@ export function Chat() {
             setUserInput("/");
             onSearch("");
           }}
-        />
+        /> */}
+        <center>
+          <Image
+            src="/dog.png"
+            alt="dog"
+            width={169}
+            height={127}
+            onClick={() => {
+              if (config.dontShowMaskSplashScreen) {
+                chatStore.newSession();
+                navigate(Path.Chat);
+              } else {
+                navigate(Path.NewChat);
+              }
+            }}
+          />
+        </center>
+        <Link to={Path.Settings}>
+          <img src="/divider.png" alt="divider" width="100%" />
+        </Link>
         <div className={styles["chat-input-panel-inner"]}>
           <textarea
             ref={inputRef}
             className={styles["chat-input"]}
-            placeholder={Locale.Chat.Input(submitKey)}
+            placeholder={Locale.Chat.Input()}
             onInput={(e) => onInput(e.currentTarget.value)}
             value={userInput}
             onKeyDown={onInputKeyDown}

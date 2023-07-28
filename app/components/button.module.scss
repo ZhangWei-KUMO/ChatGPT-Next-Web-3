@@ -20,7 +20,7 @@
   }
 
   &.primary {
-    background-color: var(--primary);
+    background-color: var(--deeppink);
     color: white;
 
     path {
@@ -45,7 +45,7 @@
 
   &:hover,
   &:focus {
-    border-color: var(--primary);
+    border-color: var(--deeppink);
   }
 }
 

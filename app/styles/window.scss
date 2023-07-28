@@ -1,13 +1,18 @@
 .window-header {
   padding: 14px 20px;
-  border-bottom: rgba(0, 0, 0, 0.1) 1px solid;
   position: relative;
-
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
+.overlay {
+  position: absolute;
+  bottom: -150px;
+  height: 150px;
+  width: 100%;
+  background-image: linear-gradient(rgba(255, 205, 205,0.5), rgba(255, 205, 205,1));
+}
 .window-header-title {
   max-width: calc(100% - 100px);
   overflow: hidden;

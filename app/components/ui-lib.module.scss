@@ -203,7 +203,7 @@
 
     .toast-action {
       padding-left: 20px;
-      color: var(--primary);
+      color: var(--deeppink);
       opacity: 0.8;
       border: 0;
       background: none;
@@ -268,7 +268,7 @@
   box-sizing: border-box;
 
   &:focus {
-    border: 1px solid var(--primary);
+    border: 1px solid var(--deeppink);
   }
 }
 

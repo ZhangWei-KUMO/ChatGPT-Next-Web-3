@@ -1,10 +1,6 @@
 @mixin container {
-  background-color: var(--white);
-  border: var(--border-in-light);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
+  background-color: var(--pink);
   color: var(--black);
-  background-color: var(--white);
   min-width: 600px;
   min-height: 480px;
   max-width: 1200px;
@@ -36,16 +32,15 @@
     border: 0;
   }
 }
-
+// 侧边栏的样式
 .sidebar {
   top: 0;
   width: var(--sidebar-width);
   box-sizing: border-box;
   padding: 20px;
-  background-color: var(--second);
-  display: flex;
+  background-color: var(--pink);
+  display: none;
   flex-direction: column;
-  box-shadow: inset -2px 0px 2px 0px rgb(0, 0, 0, 0.05);
   position: relative;
   transition: width ease 0.05s;
 
@@ -182,7 +177,7 @@
 }
 
 .chat-item-selected {
-  border-color: var(--primary);
+  border-color: var(--deeppink);
 }
 
 .chat-item-title {
@@ -291,7 +286,7 @@
       font-size: 24px;
       font-weight: bolder;
       text-align: center;
-      color: var(--primary);
+      color: var(--deeppink);
       opacity: 0.6;
     }
   }

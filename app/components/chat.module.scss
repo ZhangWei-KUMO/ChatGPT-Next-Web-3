@@ -214,13 +214,13 @@
   }
 
   &-revert-btn {
-    color: var(--primary);
+    color: var(--deeppink);
     @include hide;
   }
 
   &:hover {
     opacity: 1;
-    border-color: var(--primary);
+    border-color: var(--deeppink);
 
     .clear-context-tips {
       @include hide;
@@ -399,7 +399,6 @@
   padding-top: 10px;
   box-sizing: border-box;
   flex-direction: column;
-  border-top: var(--border-in-light);
   box-shadow: var(--card-shadow);
 
   .chat-input-actions {
@@ -457,7 +456,7 @@
 
     &-selected,
     &:hover {
-      border-color: var(--primary);
+      border-color: var(--deeppink);
     }
   }
 }
@@ -471,9 +470,8 @@
   height: 100%;
   width: 100%;
   border-radius: 10px;
-  border: var(--border-in-light);
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
-  background-color: var(--white);
+  border: none;
+  background-color: var(--pink);
   color: var(--black);
   font-family: inherit;
   padding: 10px 90px 10px 14px;
@@ -483,12 +481,8 @@
   min-height: 68px;
 }
 
-.chat-input:focus {
-  border: 1px solid var(--primary);
-}
-
 .chat-input-send {
-  background-color: var(--primary);
+  background-color: var(--deeppink);
   color: white;
 
   position: absolute;
