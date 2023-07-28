@@ -1,48 +1,70 @@
+import { type OpenAIListModelResponse } from "@/app/client/platforms/openai";
+import { getServerSideConfig } from "@/app/config/server";
+import { OpenaiPath } from "@/app/constant";
 import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
-import { OpenAI } from "langchain/llms/openai";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { LLMChain, loadQAChain } from "langchain/chains";
-import { PineconeClient } from "@pinecone-database/pinecone";
-import * as dotenv from "dotenv";
-dotenv.config();
+import { auth } from "../../auth";
+import { requestOpenai } from "../../common";
 
-const pinecone = new PineconeClient();
-const embedder = new OpenAIEmbeddings();
+const ALLOWD_PATH = new Set(Object.values(OpenaiPath));
+
+function getModels(remoteModelRes: OpenAIListModelResponse) {
+  const config = getServerSideConfig();
+
+  if (config.disableGPT4) {
+    remoteModelRes.data = remoteModelRes.data.filter(
+      (m) => !m.id.startsWith("gpt-4"),
+    );
+  }
+
+  return remoteModelRes;
+}
 
 async function handle(
   req: NextRequest,
   { params }: { params: { path: string[] } },
 ) {
+  console.log("[OpenAI Route] params ", params);
+
+  if (req.method === "OPTIONS") {
+    return NextResponse.json({ body: "OK" }, { status: 200 });
+  }
+
+  const subpath = params.path.join("/");
+
+  if (!ALLOWD_PATH.has(subpath)) {
+    console.log("[OpenAI Route] forbidden path ", subpath);
+    return NextResponse.json(
+      {
+        error: true,
+        msg: "you are not allowed to request " + subpath,
+      },
+      {
+        status: 403,
+      },
+    );
+  }
+
+  const authResult = auth(req);
+  if (authResult.error) {
+    return NextResponse.json(authResult, {
+      status: 401,
+    });
+  }
+
   try {
-    await pinecone.init({
-      environment: process.env.PINECONE_ENVIRONMENT || " ",
-      apiKey: process.env.PINECONE_API_KEY || " ",
-    });
-    const index = pinecone.Index("relai-index");
-    const pineconeStore = new PineconeStore(embedder, {
-      pineconeIndex: index,
-      namespace: "namespace1",
-    });
+    const response = await requestOpenai(req);
 
-    let q = params.path[0];
-    const docResults = await pineconeStore.similaritySearch(q, 5);
-    const llm = new OpenAI({
-      modelName: "gpt-3.5-turbo-16k-0613",
-      openAIApiKey: process.env.OPENAI_API_KEY,
-      temperature: 0.3,
-    });
+    // list models
+    if (subpath === OpenaiPath.ListModelPath && response.status === 200) {
+      const resJson = (await response.json()) as OpenAIListModelResponse;
+      const availableModels = getModels(resJson);
+      return NextResponse.json(availableModels, {
+        status: response.status,
+      });
+    }
 
-    // 启动loadQAChain
-    const chain = loadQAChain(llm, {
-      type: "stuff",
-    });
-    const llmResult = await chain.call({
-      input_documents: docResults,
-      question: "请用中文详细介绍下",
-    });
-    return NextResponse.json({ context: llmResult.text });
+    return response;
   } catch (e) {
     console.error("[OpenAI] ", e);
     return NextResponse.json(prettyObject(e));
@@ -51,3 +73,5 @@ async function handle(
 
 export const GET = handle;
 export const POST = handle;
+
+export const runtime = "edge";
