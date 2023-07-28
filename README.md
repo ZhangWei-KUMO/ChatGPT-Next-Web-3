@@ -8,6 +8,7 @@
 # 生产环境
 
 ```bash
+yarn build
 pm2 start yarn -- start
 pm2 stop yarn
 pm2 restart yarn 
