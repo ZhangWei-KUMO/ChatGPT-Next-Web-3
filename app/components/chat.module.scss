@@ -357,7 +357,7 @@
 
 .chat-message-item {
   box-sizing: border-box;
-  max-width: 100%;
+  max-width: 500px;
   margin-top: 10px;
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0.05);
@@ -490,6 +490,7 @@
 .chat-input-panel-inner {
   display: flex;
   flex: 1;
+  width: 700px;
 }
 
 .chat-input {
@@ -512,7 +513,7 @@
   color: white;
 
   position: absolute;
-  right: 30px;
+  right: 200px;
   bottom: 32px;
 }
 

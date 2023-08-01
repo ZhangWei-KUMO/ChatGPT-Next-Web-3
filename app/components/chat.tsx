@@ -1060,8 +1060,8 @@ export function Chat() {
           <Image
             src="/dog.png"
             alt="dog"
-            width={169}
-            height={127}
+            width={120}
+            height={87}
             onClick={() => {
               if (config.dontShowMaskSplashScreen) {
                 chatStore.newSession();
@@ -1072,33 +1072,37 @@ export function Chat() {
             }}
           />
         </center>
-        <Link to={Path.Settings}>
-          <img src="/divider.png" alt="divider" width="100%" />
-        </Link>
-        <div className={styles["chat-input-panel-inner"]}>
-          <textarea
-            ref={inputRef}
-            className={styles["chat-input"]}
-            placeholder={Locale.Chat.Input()}
-            onInput={(e) => onInput(e.currentTarget.value)}
-            value={userInput}
-            onKeyDown={onInputKeyDown}
-            onFocus={() => setAutoScroll(true)}
-            onBlur={() => setAutoScroll(false)}
-            rows={inputRows}
-            autoFocus={autoFocus}
-            style={{
-              fontSize: config.fontSize,
-            }}
-          />
-          <IconButton
-            icon={<SendWhiteIcon />}
-            text={Locale.Chat.Send}
-            className={styles["chat-input-send"]}
-            type="primary"
-            onClick={() => doSubmit(userInput)}
-          />
-        </div>
+        <center>
+          <Link to={Path.Settings}>
+            <img src="/divider.png" alt="divider" width="70%" />
+          </Link>
+        </center>
+        <center>
+          <div className={styles["chat-input-panel-inner"]}>
+            <textarea
+              ref={inputRef}
+              className={styles["chat-input"]}
+              placeholder={Locale.Chat.Input()}
+              onInput={(e) => onInput(e.currentTarget.value)}
+              value={userInput}
+              onKeyDown={onInputKeyDown}
+              onFocus={() => setAutoScroll(true)}
+              onBlur={() => setAutoScroll(false)}
+              rows={inputRows}
+              autoFocus={autoFocus}
+              style={{
+                fontSize: config.fontSize,
+              }}
+            />
+            <IconButton
+              icon={<SendWhiteIcon />}
+              text={Locale.Chat.Send}
+              className={styles["chat-input-send"]}
+              type="primary"
+              onClick={() => doSubmit(userInput)}
+            />
+          </div>
+        </center>
       </div>
 
       {showExport && (

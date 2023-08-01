@@ -10,7 +10,8 @@
   box-sizing: border-box;
 
   width: var(--window-width);
-  height: var(--window-height);
+  height: 100%
+  // height: var(--window-height);
 }
 
 .container {
