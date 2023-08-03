@@ -273,14 +273,14 @@ export const useChatStore = create<ChatStore>()(
         get().updateStat(message);
         get().summarizeSession();
       },
-
-      async onUserInput(content) {
+      // 用户输入，除了用户自身的问题外，同时我们会去请求向量数据库，获取相似的问题
+      async onUserInput(content, vectorstores) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
         const userContent = fillTemplateWith(content, modelConfig);
-        console.log("[User Input] after template: ", userContent);
-
+        console.log("用户输入后模板：", userContent);
+        console.log("向量数据库给出的建议：", vectorstores);
         const userMessage: ChatMessage = createMessage({
           role: "user",
           content: userContent,

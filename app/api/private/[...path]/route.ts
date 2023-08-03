@@ -42,7 +42,6 @@ async function handle(
       input_documents: docResults,
       question: "请用中文详细介绍下",
     });
-    console.log("AI对私有文本的总结", llmResult.text);
 
     return NextResponse.json({ context: llmResult.text });
   } catch (e) {
