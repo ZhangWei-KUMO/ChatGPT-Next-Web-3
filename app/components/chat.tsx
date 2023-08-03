@@ -152,35 +152,35 @@ export function SessionConfigModel(props: { onClose: () => void }) {
   );
 }
 
-function PromptToast(props: {
-  showToast?: boolean;
-  showModal?: boolean;
-  setShowModal: (_: boolean) => void;
-}) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
-  const context = session.mask.context;
+// function PromptToast(props: {
+//   showToast?: boolean;
+//   showModal?: boolean;
+//   setShowModal: (_: boolean) => void;
+// }) {
+//   const chatStore = useChatStore();
+//   const session = chatStore.currentSession();
+//   const context = session.mask.context;
 
-  return (
-    <div className={styles["prompt-toast"]} key="prompt-toast">
-      {props.showToast && (
-        <div
-          className={styles["prompt-toast-inner"] + " clickable"}
-          role="button"
-          onClick={() => props.setShowModal(true)}
-        >
-          <BrainIcon />
-          <span className={styles["prompt-toast-content"]}>
-            {Locale.Context.Toast(context.length)}
-          </span>
-        </div>
-      )}
-      {props.showModal && (
-        <SessionConfigModel onClose={() => props.setShowModal(false)} />
-      )}
-    </div>
-  );
-}
+//   return (
+//     <div className={styles["prompt-toast"]} key="prompt-toast">
+//       {props.showToast && (
+//         <div
+//           className={styles["prompt-toast-inner"] + " clickable"}
+//           role="button"
+//           onClick={() => props.setShowModal(true)}
+//         >
+//           <BrainIcon />
+//           <span className={styles["prompt-toast-content"]}>
+//             {Locale.Context.Toast(context.length)}
+//           </span>
+//         </div>
+//       )}
+//       {props.showModal && (
+//         <SessionConfigModel onClose={() => props.setShowModal(false)} />
+//       )}
+//     </div>
+//   );
+// }
 
 function useSubmitHandler() {
   const config = useAppConfig();
@@ -677,7 +677,7 @@ export function Chat() {
     }
   };
 
-  const doSubmit = (userInput: string) => {
+  const doSubmit = async (userInput: string) => {
     if (userInput.trim() === "") return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
@@ -687,8 +687,13 @@ export function Chat() {
       return;
     }
     setIsLoading(true);
-    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
+    // 存储最近的输入
     localStorage.setItem(LAST_INPUT_KEY, userInput);
+    const res = await fetch("/api/private/" + userInput);
+    let { context } = await res.json();
+    console.log("本地向量数据库返回结果：", context);
+    chatStore.onUserInput(userInput, context).then(() => setIsLoading(false));
+
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
@@ -818,22 +823,24 @@ export function Chat() {
 
     // resend the message
     setIsLoading(true);
-    chatStore.onUserInput(userMessage.content).then(() => setIsLoading(false));
+    chatStore
+      .onUserInput(userMessage.content, "")
+      .then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
-  const onPinMessage = (message: ChatMessage) => {
-    chatStore.updateCurrentSession((session) =>
-      session.mask.context.push(message),
-    );
+  // const onPinMessage = (message: ChatMessage) => {
+  //   chatStore.updateCurrentSession((session) =>
+  //     session.mask.context.push(message),
+  //   );
 
-    showToast(Locale.Chat.Actions.PinToastContent, {
-      text: Locale.Chat.Actions.PinToastAction,
-      onClick: () => {
-        setShowPromptModal(true);
-      },
-    });
-  };
+  //   showToast(Locale.Chat.Actions.PinToastContent, {
+  //     text: Locale.Chat.Actions.PinToastAction,
+  //     onClick: () => {
+  //       setShowPromptModal(true);
+  //     },
+  //   });
+  // };
 
   const context: RenderMessage[] = session.mask.hideContext
     ? []

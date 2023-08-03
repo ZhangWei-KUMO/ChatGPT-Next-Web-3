@@ -91,7 +91,7 @@ interface ChatStore {
   currentSession: () => ChatSession;
   nextSession: (delta: number) => void;
   onNewMessage: (message: ChatMessage) => void;
-  onUserInput: (content: string) => Promise<void>;
+  onUserInput: (content: string, vectorstores: string) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: ChatMessage) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -382,7 +382,7 @@ export const useChatStore = create<ChatStore>()(
         const messages = session.messages.slice();
         const totalMessageCount = session.messages.length;
 
-        // in-context prompts
+        // 上下文 prompts
         const contextPrompts = session.mask.context.slice();
 
         // system prompts, to get close to OpenAI Web ChatGPT
@@ -405,7 +405,7 @@ export const useChatStore = create<ChatStore>()(
           );
         }
 
-        // long term memory
+        // 长期记忆
         const shouldSendLongTermMemory =
           modelConfig.sendMemory &&
           session.memoryPrompt &&
@@ -422,12 +422,12 @@ export const useChatStore = create<ChatStore>()(
           totalMessageCount - modelConfig.historyMessageCount,
         );
 
-        // lets concat send messages, including 4 parts:
-        // 0. system prompt: to get close to OpenAI Web ChatGPT
-        // 1. long term memory: summarized memory messages
-        // 2. pre-defined in-context prompts
-        // 3. short term memory: latest n messages
-        // 4. newest input message
+        //  合并发送消息，包括4个部分：
+        // 0. 系统提示：接近OpenAI Web ChatGPT的提示
+        // 1. 长期记忆：总结的记忆消息
+        // 2. 预定义的上下文提示(pre-defined in-context prompts)
+        // 3. 短期记忆：最新的n条消息
+        // 4. 最新的输入消息
         const memoryStartIndex = shouldSendLongTermMemory
           ? Math.min(longTermMemoryStartIndex, shortTermMemoryStartIndex)
           : shortTermMemoryStartIndex;
@@ -435,7 +435,7 @@ export const useChatStore = create<ChatStore>()(
         const contextStartIndex = Math.max(clearContextIndex, memoryStartIndex);
         const maxTokenThreshold = modelConfig.max_tokens;
 
-        // get recent messages as much as possible
+        // 尽可能获取更多的最新消息，直到达到maxTokenThreshold
         const reversedRecentMessages = [];
         for (
           let i = totalMessageCount - 1, tokenCount = 0;
@@ -448,7 +448,7 @@ export const useChatStore = create<ChatStore>()(
           reversedRecentMessages.push(msg);
         }
 
-        // concat all messages
+        // 合并所有的消息
         const recentMessages = [
           ...systemPrompts,
           ...longTermMemoryPrompts,
@@ -625,8 +625,7 @@ export const useChatStore = create<ChatStore>()(
               // Exclude those already set by user
               !s.mask.modelConfig.hasOwnProperty("enableInjectSystemPrompts")
             ) {
-              // Because users may have changed this configuration,
-              // the user's current configuration is used instead of the default
+              // 翻译：因为用户可能已更改了此配置，所以使用用户当前的配置而不是默认配置。
               const config = useAppConfig.getState();
               s.mask.modelConfig.enableInjectSystemPrompts =
                 config.modelConfig.enableInjectSystemPrompts;
