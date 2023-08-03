@@ -690,11 +690,12 @@ export function Chat() {
     // 存储最近的输入
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     const res = await fetch("/api/private/" + userInput);
+    let tem = userInput;
+    setUserInput("");
     let { context } = await res.json();
     console.log("本地向量数据库返回结果：", context);
-    chatStore.onUserInput(userInput, context).then(() => setIsLoading(false));
+    chatStore.onUserInput(tem, context).then(() => setIsLoading(false));
 
-    setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);

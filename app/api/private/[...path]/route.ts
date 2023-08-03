@@ -40,7 +40,7 @@ async function handle(
     });
     const llmResult = await chain.call({
       input_documents: docResults,
-      question: "请用中文详细介绍下",
+      question: "总结以上文本的主要内容",
     });
 
     return NextResponse.json({ context: llmResult.text });
