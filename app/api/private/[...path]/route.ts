@@ -27,13 +27,14 @@ async function handle(
     });
 
     let q = params.path[0];
+    console.log("请求向量数据库的问题 ", q);
     const docResults = await pineconeStore.similaritySearch(q, 5);
     const llm = new OpenAI({
       modelName: "gpt-3.5-turbo-16k-0613",
       openAIApiKey: process.env.OPENAI_API_KEY,
       temperature: 0.3,
     });
-
+    console.log("搜索结果", docResults);
     // 启动loadQAChain
     const chain = loadQAChain(llm, {
       type: "stuff",
