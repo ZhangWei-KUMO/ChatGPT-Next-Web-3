@@ -286,18 +286,25 @@ export const useChatStore = create<ChatStore>()(
           content: userContent,
         });
 
+        const vectorStoreMessage: ChatMessage = createMessage({
+          role: "assistant",
+          content: vectorstores,
+        });
+
         const botMessage: ChatMessage = createMessage({
           role: "assistant",
           streaming: true,
           model: modelConfig.model,
         });
 
-        // get recent messages
+        // 获取最新聊天记录
         const recentMessages = get().getMessagesWithMemory();
+        recentMessages.concat(userMessage);
+        recentMessages.concat(vectorStoreMessage);
         const sendMessages = recentMessages.concat(userMessage);
         const messageIndex = get().currentSession().messages.length + 1;
 
-        // save user's and bot's message
+        // 存储用户和机器人的消息
         get().updateCurrentSession((session) => {
           const savedUserMessage = {
             ...userMessage,
