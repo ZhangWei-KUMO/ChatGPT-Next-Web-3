@@ -23,6 +23,7 @@
     "@vercel/analytics": "^0.1.11",
     "dotenv": "^16.3.1",
     "emoji-picker-react": "^4.4.7",
+    "encode": "^1.0.1",
     "fuse.js": "^6.6.2",
     "html-to-image": "^1.11.11",
     "langchain": "^0.0.118",

@@ -2883,6 +2883,11 @@ emoji-regex@^9.2.2:
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-9.2.2.tgz#840c8803b0d8047f4ff0cf963176b32d4ef3ed72"
   integrity sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==
 
+encode@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/encode/-/encode-1.0.1.tgz#acfd8f32f4ce34233d32ce18be55f9f3725263e3"
+  integrity sha512-bvetMbCSOIhB7VpKUbuZ3YjQLNFhJHXE+XZYquwr6yz0iEGC2wUJ4PcBmWEgZZ6HXiJ7SVwHTQAtKfw5Yi+f4w==
+
 enhanced-resolve@^5.12.0:
   version "5.12.0"
   resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.12.0.tgz#300e1c90228f5b570c4d35babf263f6da7155634"
