@@ -20,7 +20,7 @@ async function handle(
       environment: process.env.PINECONE_ENVIRONMENT || " ",
       apiKey: process.env.PINECONE_API_KEY || " ",
     });
-    const index = pinecone.Index("relai-index");
+    const index = pinecone.Index("relai");
 
     const pineconeStore = new PineconeStore(embedder, {
       pineconeIndex: index,
