@@ -1,17 +1,16 @@
 @mixin container {
   background-color: var(--pink);
   color: var(--black);
-  min-width: 1200px;
+  min-width: 600px;
   min-height: 480px;
   max-width: 1200px;
 
-  // display: flex;
+  display: flex;
   overflow: hidden;
   box-sizing: border-box;
 
   width: var(--window-width);
-  height: 100%
-  // height: var(--window-height);
+  height: var(--window-height);
 }
 
 .container {
@@ -22,8 +21,7 @@
   .tight-container {
     --window-width: 100vw;
     --window-height: var(--full-height);
-    --window-content-width: calc(100%);
-    // --window-content-width: calc(100% - var(--sidebar-width));
+    --window-content-width: calc(100% - var(--sidebar-width));
 
     @include container();
 
@@ -92,7 +90,7 @@
 }
 
 .window-content {
-  width: 100%;
+  width: var(--window-content-width);
   height: 100%;
   display: flex;
   flex-direction: column;

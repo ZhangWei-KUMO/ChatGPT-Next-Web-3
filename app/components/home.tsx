@@ -23,6 +23,7 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
+import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
 import { getClientConfig } from "../config/client";
@@ -136,7 +137,7 @@ function Screen() {
         </>
       ) : (
         <>
-          {/* <SideBar className={isHome ? styles["sidebar-show"] : ""} /> */}
+          <SideBar className={isHome ? styles["sidebar-show"] : ""} />
 
           <div className={styles["window-content"]} id={SlotID.AppBody}>
             <Routes>

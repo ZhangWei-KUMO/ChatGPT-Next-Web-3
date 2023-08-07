@@ -152,35 +152,35 @@ export function SessionConfigModel(props: { onClose: () => void }) {
   );
 }
 
-// function PromptToast(props: {
-//   showToast?: boolean;
-//   showModal?: boolean;
-//   setShowModal: (_: boolean) => void;
-// }) {
-//   const chatStore = useChatStore();
-//   const session = chatStore.currentSession();
-//   const context = session.mask.context;
+function PromptToast(props: {
+  showToast?: boolean;
+  showModal?: boolean;
+  setShowModal: (_: boolean) => void;
+}) {
+  const chatStore = useChatStore();
+  const session = chatStore.currentSession();
+  const context = session.mask.context;
 
-//   return (
-//     <div className={styles["prompt-toast"]} key="prompt-toast">
-//       {props.showToast && (
-//         <div
-//           className={styles["prompt-toast-inner"] + " clickable"}
-//           role="button"
-//           onClick={() => props.setShowModal(true)}
-//         >
-//           <BrainIcon />
-//           <span className={styles["prompt-toast-content"]}>
-//             {Locale.Context.Toast(context.length)}
-//           </span>
-//         </div>
-//       )}
-//       {props.showModal && (
-//         <SessionConfigModel onClose={() => props.setShowModal(false)} />
-//       )}
-//     </div>
-//   );
-// }
+  return (
+    <div className={styles["prompt-toast"]} key="prompt-toast">
+      {props.showToast && (
+        <div
+          className={styles["prompt-toast-inner"] + " clickable"}
+          role="button"
+          onClick={() => props.setShowModal(true)}
+        >
+          <BrainIcon />
+          <span className={styles["prompt-toast-content"]}>
+            {Locale.Context.Toast(context.length)}
+          </span>
+        </div>
+      )}
+      {props.showModal && (
+        <SessionConfigModel onClose={() => props.setShowModal(false)} />
+      )}
+    </div>
+  );
+}
 
 function useSubmitHandler() {
   const config = useAppConfig();
@@ -209,7 +209,10 @@ function useSubmitHandler() {
     if (e.key === "Enter" && (e.nativeEvent.isComposing || isComposing.current))
       return false;
     return (
+      (config.submitKey === SubmitKey.AltEnter && e.altKey) ||
       (config.submitKey === SubmitKey.CtrlEnter && e.ctrlKey) ||
+      (config.submitKey === SubmitKey.ShiftEnter && e.shiftKey) ||
+      (config.submitKey === SubmitKey.MetaEnter && e.metaKey) ||
       (config.submitKey === SubmitKey.Enter &&
         !e.altKey &&
         !e.ctrlKey &&
@@ -677,7 +680,7 @@ export function Chat() {
     }
   };
 
-  const doSubmit = async (userInput: string) => {
+  const doSubmit = (userInput: string) => {
     if (userInput.trim() === "") return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
@@ -687,18 +690,29 @@ export function Chat() {
       return;
     }
     setIsLoading(true);
-    // 存储最近的输入
+    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
     localStorage.setItem(LAST_INPUT_KEY, userInput);
-    const res = await fetch("/api/private/" + userInput);
-    let tem = userInput;
     setUserInput("");
-    let { context } = await res.json();
-    console.log("本地向量数据库返回结果：", context);
-    chatStore.onUserInput(tem, context).then(() => setIsLoading(false));
-
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
+  };
+
+  const onPromptSelect = (prompt: RenderPompt) => {
+    setTimeout(() => {
+      setPromptHints([]);
+
+      const matchedChatCommand = chatCommands.match(prompt.content);
+      if (matchedChatCommand.matched) {
+        // if user is selecting a chat command, just trigger it
+        matchedChatCommand.invoke();
+        setUserInput("");
+      } else {
+        // or fill the prompt
+        setUserInput(prompt.content);
+      }
+      inputRef.current?.focus();
+    }, 30);
   };
 
   // stop response
@@ -824,24 +838,22 @@ export function Chat() {
 
     // resend the message
     setIsLoading(true);
-    chatStore
-      .onUserInput(userMessage.content, "")
-      .then(() => setIsLoading(false));
+    chatStore.onUserInput(userMessage.content).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
-  // const onPinMessage = (message: ChatMessage) => {
-  //   chatStore.updateCurrentSession((session) =>
-  //     session.mask.context.push(message),
-  //   );
+  const onPinMessage = (message: ChatMessage) => {
+    chatStore.updateCurrentSession((session) =>
+      session.mask.context.push(message),
+    );
 
-  //   showToast(Locale.Chat.Actions.PinToastContent, {
-  //     text: Locale.Chat.Actions.PinToastAction,
-  //     onClick: () => {
-  //       setShowPromptModal(true);
-  //     },
-  //   });
-  // };
+    showToast(Locale.Chat.Actions.PinToastContent, {
+      text: Locale.Chat.Actions.PinToastAction,
+      onClick: () => {
+        setShowPromptModal(true);
+      },
+    });
+  };
 
   const context: RenderMessage[] = session.mask.hideContext
     ? []
@@ -976,7 +988,35 @@ export function Chat() {
             height={85}
             onClick={() => setIsEditingMessage(true)}
           />
+          {/* <div
+            className={`window-header-main-title ${styles["chat-body-main-title"]}`}
+            onClickCapture={() => setIsEditingMessage(true)}
+          >
+            {!session.topic ? DEFAULT_TOPIC : session.topic}
+          </div>
+          <div className="window-header-sub-title">
+            {Locale.Chat.SubTitle(session.messages.length)}
+          </div> */}
         </div>
+        <div className="window-actions">
+          {/* 导出聊天记录 */}
+          {/* <div className="window-action-button">
+            <IconButton
+              icon={<ExportIcon />}
+              bordered
+              title={Locale.Chat.Actions.Export}
+              onClick={() => {
+                setShowExport(true);
+              }}
+            />
+          </div> */}
+        </div>
+
+        {/* <PromptToast
+          showToast={!hitBottom}
+          showModal={showPromptModal}
+          setShowModal={setShowPromptModal}
+        /> */}
       </div>
 
       <div
@@ -994,7 +1034,6 @@ export function Chat() {
           const isUser = message.role === "user";
           const isContext = i < context.length;
           const showActions =
-            !isUser &&
             i > 0 &&
             !(message.preview || message.content.length === 0) &&
             !isContext;
@@ -1003,12 +1042,7 @@ export function Chat() {
           const shouldShowClearContextDivider = i === clearContextIndex - 1;
 
           return (
-            <div
-              key={i}
-              style={{
-                display: i + 1 === messages.length && isUser ? "none" : "block",
-              }}
-            >
+            <Fragment key={i}>
               <div
                 className={
                   isUser ? styles["chat-message-user"] : styles["chat-message"]
@@ -1016,6 +1050,34 @@ export function Chat() {
               >
                 <div className={styles["chat-message-container"]}>
                   <div className={styles["chat-message-header"]}>
+                    {/* <div className={styles["chat-message-avatar"]}>
+                      <div className={styles["chat-message-edit"]}>
+                        <IconButton
+                          icon={<EditIcon />}
+                          onClick={async () => {
+                            const newMessage = await showPrompt(
+                              Locale.Chat.Actions.Edit,
+                              message.content,
+                              10,
+                            );
+                            chatStore.updateCurrentSession((session) => {
+                              const m = session.messages.find(
+                                (m) => m.id === message.id,
+                              );
+                              if (m) {
+                                m.content = newMessage;
+                              }
+                            });
+                          }}
+                        ></IconButton>
+                      </div>
+                      {isUser ? (
+                        <Avatar avatar={config.avatar} />
+                      ) : (
+                        <MaskAvatar mask={session.mask} />
+                      )}
+                    </div> */}
+
                     {showActions && (
                       <div className={styles["chat-message-actions"]}>
                         <div className={styles["chat-input-actions"]}>
@@ -1027,17 +1089,39 @@ export function Chat() {
                             />
                           ) : (
                             <>
+                              {/* <ChatAction
+                                text={Locale.Chat.Actions.Retry}
+                                icon={<ResetIcon />}
+                                onClick={() => onResend(message)}
+                              /> */}
+
                               <ChatAction
                                 text={Locale.Chat.Actions.Delete}
                                 icon={<DeleteIcon />}
                                 onClick={() => onDelete(message.id ?? i)}
                               />
+
+                              {/* <ChatAction
+                                text={Locale.Chat.Actions.Pin}
+                                icon={<PinIcon />}
+                                onClick={() => onPinMessage(message)}
+                              />
+                              <ChatAction
+                                text={Locale.Chat.Actions.Copy}
+                                icon={<CopyIcon />}
+                                onClick={() => copyToClipboard(message.content)}
+                              /> */}
                             </>
                           )}
                         </div>
                       </div>
                     )}
                   </div>
+                  {/* {showTyping && (
+                    <div className={styles["chat-message-status"]}>
+                      {Locale.Chat.Typing}
+                    </div>
+                  )} */}
                   <div className={styles["chat-message-item"]}>
                     <Markdown
                       content={message.content}
@@ -1055,21 +1139,45 @@ export function Chat() {
                       defaultShow={i >= messages.length - 10}
                     />
                   </div>
+
+                  {/* <div className={styles["chat-message-action-date"]}>
+                    {isContext
+                      ? Locale.Chat.IsContext
+                      : message.date.toLocaleString()}
+                  </div> */}
                 </div>
               </div>
               {shouldShowClearContextDivider && <ClearContextDivider />}
-            </div>
+            </Fragment>
           );
         })}
       </div>
 
       <div className={styles["chat-input-panel"]}>
+        {/* <PromptHints prompts={promptHints} onPromptSelect={onPromptSelect} /> */}
+        {/* 聊天工具栏 */}
+        {/* <ChatActions
+          showPromptModal={() => setShowPromptModal(true)}
+          scrollToBottom={scrollToBottom}
+          hitBottom={hitBottom}
+          showPromptHints={() => {
+            // Click again to close
+            if (promptHints.length > 0) {
+              setPromptHints([]);
+              return;
+            }
+
+            inputRef.current?.focus();
+            setUserInput("/");
+            onSearch("");
+          }}
+        /> */}
         <center>
           <Image
             src="/dog.png"
             alt="dog"
-            width={120}
-            height={87}
+            width={169}
+            height={127}
             onClick={() => {
               if (config.dontShowMaskSplashScreen) {
                 chatStore.newSession();
@@ -1080,37 +1188,33 @@ export function Chat() {
             }}
           />
         </center>
-        <center>
-          <Link to={Path.Settings}>
-            <img src="/divider.png" alt="divider" width="70%" />
-          </Link>
-        </center>
-        <center>
-          <div className={styles["chat-input-panel-inner"]}>
-            <textarea
-              ref={inputRef}
-              className={styles["chat-input"]}
-              placeholder={Locale.Chat.Input()}
-              onInput={(e) => onInput(e.currentTarget.value)}
-              value={userInput}
-              onKeyDown={onInputKeyDown}
-              onFocus={() => setAutoScroll(true)}
-              onBlur={() => setAutoScroll(false)}
-              rows={inputRows}
-              autoFocus={autoFocus}
-              style={{
-                fontSize: config.fontSize,
-              }}
-            />
-            <IconButton
-              icon={<SendWhiteIcon />}
-              text={Locale.Chat.Send}
-              className={styles["chat-input-send"]}
-              type="primary"
-              onClick={() => doSubmit(userInput)}
-            />
-          </div>
-        </center>
+        <Link to={Path.Settings}>
+          <img src="/divider.png" alt="divider" width="100%" />
+        </Link>
+        <div className={styles["chat-input-panel-inner"]}>
+          <textarea
+            ref={inputRef}
+            className={styles["chat-input"]}
+            placeholder={Locale.Chat.Input()}
+            onInput={(e) => onInput(e.currentTarget.value)}
+            value={userInput}
+            onKeyDown={onInputKeyDown}
+            onFocus={() => setAutoScroll(true)}
+            onBlur={() => setAutoScroll(false)}
+            rows={inputRows}
+            autoFocus={autoFocus}
+            style={{
+              fontSize: config.fontSize,
+            }}
+          />
+          <IconButton
+            icon={<SendWhiteIcon />}
+            text={Locale.Chat.Send}
+            className={styles["chat-input-send"]}
+            type="primary"
+            onClick={() => doSubmit(userInput)}
+          />
+        </div>
       </div>
 
       {showExport && (
