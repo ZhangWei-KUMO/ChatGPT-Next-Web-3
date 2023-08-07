@@ -9,22 +9,19 @@ export type ModelType = (typeof DEFAULT_MODELS)[number]["name"];
 export enum SubmitKey {
   Enter = "Enter",
   CtrlEnter = "Ctrl + Enter",
-  ShiftEnter = "Shift + Enter",
-  AltEnter = "Alt + Enter",
-  MetaEnter = "Meta + Enter",
 }
 
 export enum Theme {
+  Light = "light",
   Auto = "auto",
   Dark = "dark",
-  Light = "light",
 }
 
 export const DEFAULT_CONFIG = {
-  submitKey: SubmitKey.CtrlEnter as SubmitKey,
+  submitKey: SubmitKey.Enter as SubmitKey,
   avatar: "1f603",
   fontSize: 14,
-  theme: Theme.Auto as Theme,
+  theme: Theme.Light as Theme,
   tightBorder: !!getClientConfig()?.isApp,
   sendPreviewBubble: true,
   sidebarWidth: 300,
@@ -36,9 +33,9 @@ export const DEFAULT_CONFIG = {
 
   customModels: "",
   models: DEFAULT_MODELS as any as LLMModel[],
-
+  // 设置
   modelConfig: {
-    model: "gpt-3.5-turbo" as ModelType,
+    model: "gpt-4" as ModelType,
     temperature: 0.5,
     top_p: 1,
     max_tokens: 2000,
