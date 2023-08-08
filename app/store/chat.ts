@@ -296,9 +296,14 @@ export const useChatStore = create<ChatStore>()(
         recentMessages.concat(userMessage);
         const res = await fetch("/api/private/" + content);
         let { context } = await res.json();
+
+        const dbMessage: ChatMessage = createMessage({
+          role: "assistant",
+          content: context,
+        });
         console.log("本地向量数据库返回结果：", context);
 
-        const sendMessages = recentMessages.concat(context);
+        const sendMessages = recentMessages.concat(dbMessage);
         const messageIndex = get().currentSession().messages.length + 1;
 
         // // 存储用户和机器人的消息
