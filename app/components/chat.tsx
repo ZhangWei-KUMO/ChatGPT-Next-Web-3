@@ -689,7 +689,6 @@ export function Chat() {
     // 将当前用户的输入值暂存
     let tem = userInput;
     // 清除输入框
-    setUserInput("");
     setIsLoading(true);
     // 存储最近的输入
     localStorage.setItem(LAST_INPUT_KEY, tem);
@@ -697,7 +696,7 @@ export function Chat() {
     let { context } = await res.json();
     console.log("本地向量数据库返回结果：", context);
     chatStore.onUserInput(tem, context).then(() => setIsLoading(false));
-
+    setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
