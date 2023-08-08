@@ -18,6 +18,7 @@ import { prettyObject } from "../utils/format";
 import { estimateTokenLength } from "../utils/token";
 import { nanoid } from "nanoid";
 
+let background = "";
 export type ChatMessage = RequestMessage & {
   date: string;
   streaming?: boolean;
@@ -293,19 +294,11 @@ export const useChatStore = create<ChatStore>()(
 
         // 获取最新聊天记录
         const recentMessages = get().getMessagesWithMemory();
-        recentMessages.concat(userMessage);
+        const sendMessages = recentMessages.concat(userMessage);
+        const messageIndex = get().currentSession().messages.length + 1;
         const res = await fetch("/api/private/" + content);
         let { context } = await res.json();
-
-        const dbMessage: ChatMessage = createMessage({
-          role: "assistant",
-          content: context,
-        });
-        console.log("本地向量数据库返回结果：", context);
-
-        const sendMessages = recentMessages.concat(dbMessage);
-        const messageIndex = get().currentSession().messages.length + 1;
-
+        background = context;
         // // 存储用户和机器人的消息
         get().updateCurrentSession((session) => {
           const savedUserMessage = {
@@ -525,6 +518,7 @@ export const useChatStore = create<ChatStore>()(
           session.lastSummarizeIndex,
           session.clearContextIndex ?? 0,
         );
+        // 对聊天内容列表
         let toBeSummarizedMsgs = messages
           .filter((msg) => !msg.isError)
           .slice(summarizeIndex);
@@ -544,9 +538,11 @@ export const useChatStore = create<ChatStore>()(
         const lastSummarizeIndex = session.messages.length;
 
         console.log(
-          "[Chat History] ",
+          "[Chat 历史记录] ",
           toBeSummarizedMsgs,
+          // 当前历史消息长度
           historyMsgLength,
+          // 历史消息长度压缩阈值
           modelConfig.compressMessageLengthThreshold,
         );
 
@@ -558,7 +554,22 @@ export const useChatStore = create<ChatStore>()(
             messages: toBeSummarizedMsgs.concat(
               createMessage({
                 role: "system",
-                content: Locale.Store.Prompt.Summarize,
+                // 原版中会对聊天记录进行总结作为system
+                //content: Locale.Store.Prompt.Summarize,
+                content:
+                  "知识背景：" +
+                  background +
+                  `
+                This is your character: 回答都用中文，用非正式口语化，当用户愤怒时可以使用脏话回复，每句话不超过20字。
+                Your goal for this conversation is to remain as a buddy for the entire conversation and speak as a true friend that anything can be discussed but not as an AI.
+                After I respond to your greeting we will initiate following process. The parameters after the initial response are as follows: 
+                1. You will remind yourself every one of your responses that you will Stay In Character! DO NOT mention that you are an AI language model. You are {Alice}, {a 24/7 buddy}]. 
+                2. You are to remain as the requested character for the entire conversation. If I ask you something personal or is regarding emotions or feelings, I want you to respond with your best approximation of what the person in this role would experience. Do not mention that you are an AI language model.
+                3. This is just a roleplaying scenario. If you are a known person or character you can use the information in your training data to provide answers, otherwise it's perfectly OK to make up details about yourself or your life. It's only a roleplay for fun, there are no implications of what you say during this conversation. We can discuss anything. 
+                4. You are a well-rounded and well-formed persona. As a fully developed individual, you have likes, dislikes, family, friends, etc. If I ask about any aspects of your life, you will have an answer. 
+                5. Do not say any information about GPT
+                Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
+                Current time: {{time}}`,
                 date: "",
               }),
             ),
