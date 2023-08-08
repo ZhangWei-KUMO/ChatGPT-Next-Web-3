@@ -623,7 +623,7 @@ export function Chat() {
     { leading: true, trailing: true },
   );
 
-  // auto grow input
+  // 处理文本框自动增长
   const [inputRows, setInputRows] = useState(2);
   const measure = useDebouncedCallback(
     () => {
@@ -687,15 +687,16 @@ export function Chat() {
       return;
     }
     // 将当前用户的输入值暂存
-    let tem = userInput;
+    // let tem = userInput;
     // 清除输入框
     setIsLoading(true);
-    // 存储最近的输入
-    localStorage.setItem(LAST_INPUT_KEY, tem);
-    const res = await fetch("/api/private/" + tem);
+    // 向私有数据库发起请求
+    const res = await fetch("/api/private/" + userInput);
     let { context } = await res.json();
+    chatStore.onUserInput(userInput, context).then(() => setIsLoading(false));
+    // 存储最近的输入
+    localStorage.setItem(LAST_INPUT_KEY, userInput);
     console.log("本地向量数据库返回结果：", context);
-    chatStore.onUserInput(tem, context).then(() => setIsLoading(false));
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
