@@ -400,7 +400,7 @@ export function ChatActions(props: {
   const navigate = useNavigate();
   const chatStore = useChatStore();
 
-  // switch themes
+  // 切换主题色
   const theme = config.theme;
   function nextTheme() {
     const themes = [Theme.Auto, Theme.Light, Theme.Dark];
@@ -410,11 +410,11 @@ export function ChatActions(props: {
     config.update((config) => (config.theme = nextTheme));
   }
 
-  // stop all responses
+  // 停止回复
   const couldStop = ChatControllerPool.hasPending();
   const stopAll = () => ChatControllerPool.stopAll();
 
-  // switch model
+  // 切换模型
   const currentModel = chatStore.currentSession().mask.modelConfig.model;
   const models = useMemo(
     () =>
@@ -657,13 +657,13 @@ export function Chat() {
     del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
   });
 
-  // only search prompts when user input is short
+  // 用户搜索Prompt
   const SEARCH_TEXT_LIMIT = 30;
   const onInput = (text: string) => {
     setUserInput(text);
     const n = text.trim().length;
 
-    // clear search results
+    // 清除搜索结果
     if (n === 0) {
       setPromptHints([]);
     } else if (text.startsWith(ChatCommandPrefix)) {
@@ -686,12 +686,14 @@ export function Chat() {
       matchCommand.invoke();
       return;
     }
+    // 将当前用户的输入值暂存
     let tem = userInput;
+    // 清除输入框
     setUserInput("");
     setIsLoading(true);
     // 存储最近的输入
-    localStorage.setItem(LAST_INPUT_KEY, userInput);
-    const res = await fetch("/api/private/" + userInput);
+    localStorage.setItem(LAST_INPUT_KEY, tem);
+    const res = await fetch("/api/private/" + tem);
     let { context } = await res.json();
     console.log("本地向量数据库返回结果：", context);
     chatStore.onUserInput(tem, context).then(() => setIsLoading(false));
