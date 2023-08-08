@@ -6,7 +6,6 @@ import EmojiPicker, {
 
 import { ModelType } from "../store";
 
-import BotIcon from "../icons/bot.svg";
 import BlackBotIcon from "../icons/black-bot.svg";
 
 export function getEmojiUrl(unified: string, style: EmojiStyle) {
@@ -34,9 +33,7 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
       <div className="no-dark">
         {props.model?.startsWith("gpt-4") ? (
           <BlackBotIcon className="user-avatar" />
-        ) : (
-          <BotIcon className="user-avatar" />
-        )}
+        ) : null}
       </div>
     );
   }

@@ -691,9 +691,9 @@ export function Chat() {
     // 清除输入框
     setIsLoading(true);
     // 向私有数据库发起请求
-    const res = await fetch("/api/private/" + userInput);
-    let { context } = await res.json();
-    chatStore.onUserInput(userInput, context).then(() => setIsLoading(false));
+    // const res = await fetch("/api/private/" + userInput);
+    // let { context } = await res.json();
+    chatStore.onUserInput(userInput, "context").then(() => setIsLoading(false));
     // 存储最近的输入
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     console.log("本地向量数据库返回结果：", context);
