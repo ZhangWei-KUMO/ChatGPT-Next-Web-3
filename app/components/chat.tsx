@@ -686,15 +686,9 @@ export function Chat() {
       matchCommand.invoke();
       return;
     }
-    // 将当前用户的输入值暂存
     setIsLoading(true);
-    chatStore.onUserInput(userInput);
-    localStorage.setItem(LAST_INPUT_KEY, userInput);
-    // 向私有数据库发起请求
-
-    // 将向量数据库的数据和用户输入加载
     chatStore.onUserInput(userInput).then(() => setIsLoading(false));
-    // 存储最近的输入
+    localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
