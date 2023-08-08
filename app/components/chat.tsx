@@ -687,15 +687,15 @@ export function Chat() {
       return;
     }
     // 将当前用户的输入值暂存
-    // let tem = userInput;
+    let tem = userInput;
     // 清除输入框
     setIsLoading(true);
     // 向私有数据库发起请求
-    // const res = await fetch("/api/private/" + userInput);
+    const res = await fetch("/api/private/" + tem);
     // let { context } = await res.json();
-    chatStore.onUserInput(userInput, "context").then(() => setIsLoading(false));
+    chatStore.onUserInput(tem, "context").then(() => setIsLoading(false));
     // 存储最近的输入
-    localStorage.setItem(LAST_INPUT_KEY, userInput);
+    localStorage.setItem(LAST_INPUT_KEY, tem);
     console.log("本地向量数据库返回结果：", context);
     setUserInput("");
     setPromptHints([]);
