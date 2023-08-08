@@ -295,10 +295,10 @@ export const useChatStore = create<ChatStore>()(
         // 获取最新聊天记录
         const recentMessages = get().getMessagesWithMemory();
         recentMessages.concat(userMessage);
-        const sendMessages = recentMessages.concat(userMessage);
-        const messageIndex = get().currentSession().messages.length + 1;
+        // const sendMessages = recentMessages.concat(userMessage);
+        // const messageIndex = get().currentSession().messages.length + 1;
 
-        // 存储用户和机器人的消息
+        // // 存储用户和机器人的消息
         get().updateCurrentSession((session) => {
           const savedUserMessage = {
             ...userMessage,
@@ -310,57 +310,57 @@ export const useChatStore = create<ChatStore>()(
           ]);
         });
 
-        // make request
-        api.llm.chat({
-          messages: sendMessages,
-          config: { ...modelConfig, stream: true },
-          onUpdate(message) {
-            botMessage.streaming = true;
-            if (message) {
-              botMessage.content = message;
-            }
-            get().updateCurrentSession((session) => {
-              session.messages = session.messages.concat();
-            });
-          },
-          onFinish(message) {
-            botMessage.streaming = false;
-            if (message) {
-              botMessage.content = message;
-              get().onNewMessage(botMessage);
-            }
-            ChatControllerPool.remove(session.id, botMessage.id);
-          },
-          onError(error) {
-            const isAborted = error.message.includes("aborted");
-            botMessage.content =
-              "\n\n" +
-              prettyObject({
-                error: true,
-                message: error.message,
-              });
-            botMessage.streaming = false;
-            userMessage.isError = !isAborted;
-            botMessage.isError = !isAborted;
-            get().updateCurrentSession((session) => {
-              session.messages = session.messages.concat();
-            });
-            ChatControllerPool.remove(
-              session.id,
-              botMessage.id ?? messageIndex,
-            );
+        // // make request
+        // api.llm.chat({
+        //   messages: sendMessages,
+        //   config: { ...modelConfig, stream: true },
+        //   onUpdate(message) {
+        //     botMessage.streaming = true;
+        //     if (message) {
+        //       botMessage.content = message;
+        //     }
+        //     get().updateCurrentSession((session) => {
+        //       session.messages = session.messages.concat();
+        //     });
+        //   },
+        //   onFinish(message) {
+        //     botMessage.streaming = false;
+        //     if (message) {
+        //       botMessage.content = message;
+        //       get().onNewMessage(botMessage);
+        //     }
+        //     ChatControllerPool.remove(session.id, botMessage.id);
+        //   },
+        //   onError(error) {
+        //     const isAborted = error.message.includes("aborted");
+        //     botMessage.content =
+        //       "\n\n" +
+        //       prettyObject({
+        //         error: true,
+        //         message: error.message,
+        //       });
+        //     botMessage.streaming = false;
+        //     userMessage.isError = !isAborted;
+        //     botMessage.isError = !isAborted;
+        //     get().updateCurrentSession((session) => {
+        //       session.messages = session.messages.concat();
+        //     });
+        //     ChatControllerPool.remove(
+        //       session.id,
+        //       botMessage.id ?? messageIndex,
+        //     );
 
-            console.error("[Chat] failed ", error);
-          },
-          onController(controller) {
-            // collect controller for stop/retry
-            ChatControllerPool.addController(
-              session.id,
-              botMessage.id ?? messageIndex,
-              controller,
-            );
-          },
-        });
+        //     console.error("[Chat] failed ", error);
+        //   },
+        //   onController(controller) {
+        //     // collect controller for stop/retry
+        //     ChatControllerPool.addController(
+        //       session.id,
+        //       botMessage.id ?? messageIndex,
+        //       controller,
+        //     );
+        //   },
+        // });
       },
 
       async onDBInput(content) {
@@ -370,7 +370,7 @@ export const useChatStore = create<ChatStore>()(
         const userContent = fillTemplateWith(content, modelConfig);
         // 用户输入信息对象
         const userMessage: ChatMessage = createMessage({
-          role: "user",
+          role: "assistant",
           content: userContent,
         });
 
