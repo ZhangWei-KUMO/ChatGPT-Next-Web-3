@@ -687,16 +687,17 @@ export function Chat() {
       return;
     }
     // 将当前用户的输入值暂存
+    setIsLoading(true);
+    chatStore.onUserInput(userInput);
+    localStorage.setItem(LAST_INPUT_KEY, userInput);
     let tem = userInput;
     setUserInput("");
-
-    localStorage.setItem(LAST_INPUT_KEY, tem);
-    setIsLoading(true);
 
     // 向私有数据库发起请求
     const res = await fetch("/api/private/" + tem);
     let { context } = await res.json();
-    chatStore.onUserInput(tem, context).then(() => setIsLoading(false));
+    // 将向量数据库的数据和用户输入加载
+    chatStore.onDBInput(context).then(() => setIsLoading(false));
     // 存储最近的输入
     console.log("本地向量数据库返回结果：", context);
 
@@ -828,9 +829,7 @@ export function Chat() {
 
     // resend the message
     setIsLoading(true);
-    chatStore
-      .onUserInput(userMessage.content, "")
-      .then(() => setIsLoading(false));
+    chatStore.onUserInput(userMessage.content).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
