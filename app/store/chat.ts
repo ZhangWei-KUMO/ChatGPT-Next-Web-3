@@ -296,9 +296,7 @@ export const useChatStore = create<ChatStore>()(
         const recentMessages = get().getMessagesWithMemory();
         const sendMessages = recentMessages.concat(userMessage);
         const messageIndex = get().currentSession().messages.length + 1;
-        const res = await fetch("/api/private/" + content);
-        let { context } = await res.json();
-        background = context;
+
         // // 存储用户和机器人的消息
         get().updateCurrentSession((session) => {
           const savedUserMessage = {
@@ -310,6 +308,10 @@ export const useChatStore = create<ChatStore>()(
             botMessage,
           ]);
         });
+
+        const res = await fetch("/api/private/" + content);
+        let { context } = await res.json();
+        background = context;
 
         // make request
         api.llm.chat({
