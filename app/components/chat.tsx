@@ -690,17 +690,12 @@ export function Chat() {
     setIsLoading(true);
     chatStore.onUserInput(userInput);
     localStorage.setItem(LAST_INPUT_KEY, userInput);
-    let tem = userInput;
-    setUserInput("");
-
     // 向私有数据库发起请求
-    const res = await fetch("/api/private/" + tem);
-    let { context } = await res.json();
-    // 将向量数据库的数据和用户输入加载
-    chatStore.onDBInput(context).then(() => setIsLoading(false));
-    // 存储最近的输入
-    console.log("本地向量数据库返回结果：", context);
 
+    // 将向量数据库的数据和用户输入加载
+    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
+    // 存储最近的输入
+    setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
