@@ -363,7 +363,7 @@ export const useChatStore = create<ChatStore>()(
           },
         });
       },
-
+      // 原始代码是从聊天记录中进行总结，这里则是根据向量数据库的结果而来
       getMemoryPrompt() {
         const session = get().currentSession();
 
