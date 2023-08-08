@@ -686,12 +686,12 @@ export function Chat() {
       matchCommand.invoke();
       return;
     }
+    let tem = userInput;
+    setUserInput("");
     setIsLoading(true);
     // 存储最近的输入
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     const res = await fetch("/api/private/" + userInput);
-    let tem = userInput;
-    setUserInput("");
     let { context } = await res.json();
     console.log("本地向量数据库返回结果：", context);
     chatStore.onUserInput(tem, context).then(() => setIsLoading(false));
