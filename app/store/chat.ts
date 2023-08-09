@@ -315,9 +315,9 @@ export const useChatStore = create<ChatStore>()(
           "https://api.relai.social/rest-api/plugins/google?input_str=" +
             content,
         );
-        // let { context } = await google_res.json();
-        console.log("Google查询结果：", google_res);
-        background = context + google_res;
+        let text = await google_res.text();
+        console.log("Google查询结果：", text);
+        background = context + text;
 
         // make request
         api.llm.chat({
