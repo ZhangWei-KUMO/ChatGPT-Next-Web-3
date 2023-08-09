@@ -302,11 +302,6 @@ export const useChatStore = create<ChatStore>()(
           model: modelConfig.model,
         });
 
-        // 获取最新聊天记录
-        const recentMessages = await get().getMessagesWithMemory(content);
-        const sendMessages = recentMessages.concat(userMessage);
-        const messageIndex = get().currentSession().messages.length + 1;
-
         // // 存储用户和机器人的消息
         get().updateCurrentSession((session) => {
           const savedUserMessage = {
@@ -318,6 +313,12 @@ export const useChatStore = create<ChatStore>()(
             botMessage,
           ]);
         });
+
+        // 获取最新聊天记录
+        const recentMessages = await get().getMessagesWithMemory(content);
+        // 发生给GPT的聊天记录
+        const sendMessages = recentMessages.concat(userMessage);
+        const messageIndex = get().currentSession().messages.length + 1;
 
         // make request
         api.llm.chat({
