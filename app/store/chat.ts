@@ -28,9 +28,6 @@ let background = "";
 // 6. 你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子
 // Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
 // Current time: {{time}}`;
-export const DEFAULT_SYSTEM_TEMPLATE = `你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子。请基于${background}作为知识背景，对用户提出的问题进行回复，不要有哎呀这样的语气词。内容控制在1句话。
-Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
-Current time: {{time}}`;
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -115,7 +112,7 @@ interface ChatStore {
     updater: (message?: ChatMessage) => void,
   ) => void;
   resetSession: () => void;
-  getMessagesWithMemory: () => ChatMessage[];
+  getMessagesWithMemory: (content: string) => Promise<ChatMessage[]>;
   getMemoryPrompt: () => ChatMessage;
 
   clearAllData: () => void;
@@ -306,7 +303,7 @@ export const useChatStore = create<ChatStore>()(
         });
 
         // 获取最新聊天记录
-        const recentMessages = get().getMessagesWithMemory();
+        const recentMessages = await get().getMessagesWithMemory(content);
         const sendMessages = recentMessages.concat(userMessage);
         const messageIndex = get().currentSession().messages.length + 1;
 
@@ -326,13 +323,7 @@ export const useChatStore = create<ChatStore>()(
         const res = await fetch("/api/private/" + content);
         let { context } = await res.json();
 
-        const google_res = await fetch(
-          "https://api.relai.social/rest-api/plugins/google?input_str=" +
-            content,
-        );
-        let text = await google_res.text();
-        console.log("Google查询结果：", text);
-        background = text;
+        background = context;
 
         // make request
         api.llm.chat({
@@ -403,8 +394,17 @@ export const useChatStore = create<ChatStore>()(
           date: "",
         } as ChatMessage;
       },
-
-      getMessagesWithMemory() {
+      // 核心代码，获取最新的聊天记录
+      async getMessagesWithMemory(content) {
+        const google_res = await fetch(
+          "https://api.relai.social/rest-api/plugins/google?input_str=" +
+            content,
+        );
+        let google_result = await google_res.text();
+        console.log("Google查询结果：", google_result);
+        const DEFAULT_SYSTEM_TEMPLATE = `你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子。请基于${google_result}作为知识背景，对用户提出的问题进行回复，不要有哎呀这样的语气词。内容控制在1句话。
+            Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
+            Current time: {{time}}`;
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
         const clearContextIndex = session.clearContextIndex ?? 0;
