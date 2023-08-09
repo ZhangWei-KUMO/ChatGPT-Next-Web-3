@@ -33,17 +33,17 @@ export const DEFAULT_CONFIG = {
 
   customModels: "",
   models: DEFAULT_MODELS as any as LLMModel[],
-  // 设置
+  // 初始设置
   modelConfig: {
     model: "gpt-4" as ModelType,
-    temperature: 0.5,
+    temperature: 0.2,
     top_p: 1,
-    max_tokens: 2000,
+    max_tokens: 200,
     presence_penalty: 0,
     frequency_penalty: 0,
     sendMemory: true,
-    historyMessageCount: 4,
-    compressMessageLengthThreshold: 1000,
+    historyMessageCount: 32,
+    compressMessageLengthThreshold: 3000,
     enableInjectSystemPrompts: true,
     template: DEFAULT_INPUT_TEMPLATE,
   },
