@@ -686,9 +686,8 @@ export function Chat() {
       matchCommand.invoke();
       return;
     }
-    // setIsLoading(true);
-    chatStore.onUserInput(userInput);
-    // .then(() => setIsLoading(false));
+    setIsLoading(true);
+    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
