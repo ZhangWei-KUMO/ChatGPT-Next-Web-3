@@ -317,7 +317,7 @@ export const useChatStore = create<ChatStore>()(
         );
         let text = await google_res.text();
         console.log("Google查询结果：", text);
-        background = context + text;
+        background = text;
 
         // make request
         api.llm.chat({
