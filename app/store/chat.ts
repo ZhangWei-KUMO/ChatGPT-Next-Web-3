@@ -311,7 +311,13 @@ export const useChatStore = create<ChatStore>()(
 
         const res = await fetch("/api/private/" + content);
         let { context } = await res.json();
-        background = context;
+        const google_res = await fetch(
+          "https://api.relai.social/rest-api/plugins/google?input_str=" +
+            content,
+        );
+        // let { context } = await google_res.json();
+        console.log("Google查询结果：", google_res);
+        background = context + google_res;
 
         // make request
         api.llm.chat({
