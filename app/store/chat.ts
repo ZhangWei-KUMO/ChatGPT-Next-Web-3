@@ -319,12 +319,6 @@ export const useChatStore = create<ChatStore>()(
           ]);
         });
 
-        // 获取向量数据库数据
-        const res = await fetch("/api/private/" + content);
-        let { context } = await res.json();
-
-        background = context;
-
         // make request
         api.llm.chat({
           messages: sendMessages,
@@ -383,15 +377,10 @@ export const useChatStore = create<ChatStore>()(
 
         return {
           role: "system",
-          // content:session.memoryPrompt.length > 0? Locale.Store.Prompt.History(session.memoryPrompt): "",
           content:
-            "你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子，你将基于以下知识背景：" +
-            background +
-            `
-            对用户提出的问题进行回复，不要有哎呀这样的语气词。内容控制在1句话"。
-            Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
-            Current time: {{time}}`,
-          date: "",
+            session.memoryPrompt.length > 0
+              ? Locale.Store.Prompt.History(session.memoryPrompt)
+              : "",
         } as ChatMessage;
       },
       // 核心代码，获取最新的聊天记录
@@ -402,6 +391,12 @@ export const useChatStore = create<ChatStore>()(
         );
         let google_result = await google_res.text();
         console.log("Google查询结果：", google_result);
+
+        // 获取向量数据库数据
+        // const res = await fetch("/api/private/" + content);
+        // let { context } = await res.json();
+
+        // background = context;
         const DEFAULT_SYSTEM_TEMPLATE = `你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子。请基于${google_result}作为知识背景，对用户提出的问题进行回复，不要有哎呀这样的语气词。内容控制在1句话。
             Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
             Current time: {{time}}`;
@@ -583,15 +578,7 @@ export const useChatStore = create<ChatStore>()(
               createMessage({
                 role: "system",
                 // 原版中会对聊天记录进行总结作为system
-                //content: Locale.Store.Prompt.Summarize,
-                content:
-                  "你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子，你将基于以下知识背景：" +
-                  background +
-                  `
-            。对用户提出的问题进行回复，不要有哎呀这样的语气词。内容控制在1句话"。
-            Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
-            Current time: {{time}}`,
-                date: "",
+                content: Locale.Store.Prompt.Summarize,
               }),
             ),
             config: { ...modelConfig, stream: true },
