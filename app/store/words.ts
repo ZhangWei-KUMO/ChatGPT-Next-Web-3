@@ -1,4 +1,4 @@
-export const discourse_particles = {
+export const discourse_particles = `{
   开心: [
     "哇",
     "耶",
@@ -52,6 +52,6 @@ export const discourse_particles = {
     "Hummmm...",
     "你没事吧",
   ],
-};
+}`;
 
 export const moods = "开心,惊讶,生气,伤心";
