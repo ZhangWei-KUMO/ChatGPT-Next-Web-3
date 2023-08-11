@@ -36,4 +36,6 @@ dev
 
 .vscode
 .idea
-
+yarn.lock
+package-lock.json
+login_server.sh
