@@ -35,7 +35,7 @@ export const DEFAULT_CONFIG = {
   models: DEFAULT_MODELS as any as LLMModel[],
   // 初始设置
   modelConfig: {
-    model: "gpt-4" as ModelType,
+    model: "gpt-3.5-turbo" as ModelType,
     temperature: 0.2,
     top_p: 1,
     max_tokens: 200,

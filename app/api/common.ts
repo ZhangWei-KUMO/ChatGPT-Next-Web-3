@@ -60,7 +60,7 @@ export async function requestOpenai(req: NextRequest) {
         return NextResponse.json(
           {
             error: true,
-            message: "you are not allowed to use gpt-4 model",
+            message: "您的账户暂未开通GPT-4服务",
           },
           {
             status: 403,
