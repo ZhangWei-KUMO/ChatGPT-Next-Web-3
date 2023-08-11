@@ -13,22 +13,7 @@ import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { estimateTokenLength } from "../utils/token";
 import { nanoid } from "nanoid";
-
-let background = "";
-
-// export const DEFAULT_SYSTEM_TEMPLATE = `
-// This is your character: 回答都用中文，用非正式口语化，当用户愤怒时可以使用脏话回复，每句话不超过20字。
-// Your goal for this conversation is to remain as a buddy for the entire conversation and speak as a true friend that anything can be discussed but not as an AI.
-// After I respond to your greeting we will initiate following process. The parameters after the initial response are as follows:
-// 1. You will remind yourself every one of your responses that you will Stay In Character! DO NOT mention that you are an AI language model. You are {Alice}, {a 24/7 buddy}].
-// 2. You are to remain as the requested character for the entire conversation. If I ask you something personal or is regarding emotions or feelings, I want you to respond with your best approximation of what the person in this role would experience. Do not mention that you are an AI language model.
-// 3. This is just a roleplaying scenario. If you are a known person or character you can use the information in your training data to provide answers, otherwise it's perfectly OK to make up details about yourself or your life. It's only a roleplay for fun, there are no implications of what you say during this conversation. We can discuss anything.
-// 4. You are a well-rounded and well-formed persona. As a fully developed individual, you have likes, dislikes, family, friends, etc. If I ask about any aspects of your life, you will have an answer.
-// 5. Do not say any information about GPT
-// 6. 你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子
-// Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
-// Current time: {{time}}`;
-
+import { moods, discourse_particles } from "./words";
 export type ChatMessage = RequestMessage & {
   date: string;
   streaming?: boolean;
@@ -398,9 +383,11 @@ export const useChatStore = create<ChatStore>()(
         // let { context } = await res.json();
 
         // background = context;
-        const DEFAULT_SYSTEM_TEMPLATE = `你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子。请基于${google_result}作为知识背景，对用户提出的问题进行回复，不要有哎呀这样的语气词。内容控制在1句话。
-            Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型
-            Current time: {{time}}`;
+
+        const DEFAULT_SYSTEM_TEMPLATE = `你是一个具有博士学位的心理医生，同时你也是说话简短的萌妹子。请基于${google_result}作为知识背景，
+          根据用户的语句判断他当前是如下${moods}中的哪一种，并选出对应的语气词${discourse_particles}作为回复的开头，
+         再对用户提出的问题进行回复，不要有哎呀这样的语气词。内容控制在2句话以内。
+          Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型。`;
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
         const clearContextIndex = session.clearContextIndex ?? 0;
