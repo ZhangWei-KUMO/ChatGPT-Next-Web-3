@@ -54,4 +54,4 @@ export const discourse_particles = {
   ],
 };
 
-export const moods = ["开心", "惊讶", "生气", "伤心"];
+export const moods = "开心,惊讶,生气,伤心";
