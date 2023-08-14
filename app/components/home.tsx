@@ -28,7 +28,7 @@ import { useAccessStore } from "../store";
 export function Loading(props: { noLogo?: boolean }) {
   return (
     <div className={styles["loading-content"] + " no-dark"}>
-      <p>对方正在输入中...</p>
+      <p>页面加载中...</p>
     </div>
   );
 }
