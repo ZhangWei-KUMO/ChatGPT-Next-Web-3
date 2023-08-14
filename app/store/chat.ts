@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import { trimTopic } from "../utils";
+import { OpenAI } from "langchain/llms/openai";
 
 import Locale, { getLang } from "../locales";
 import { showToast } from "../components/ui-lib";
@@ -377,15 +378,21 @@ export const useChatStore = create<ChatStore>()(
         );
         let google_result = await google_res.text();
         console.log("Google查询结果：", google_result);
-
+        // 根据用户输入的内容，判断当前用户心情，并选出以下最为适合回复的语气词
+        const llm = new OpenAI({
+          openAIApiKey: process.env.OPENAI_API_KEY,
+        });
+        const res = await llm.call(`根据用户输入的内容：${content}，
+        判断当前用户心情，并选出以下${discourse_particles}最为适合回复的语气词`);
+        console.log(res);
+        // let { context } = await res.json();
         // 获取向量数据库数据
         // const res = await fetch("/api/private/" + content);
         // let { context } = await res.json();
 
         // background = context;
-
         const DEFAULT_SYSTEM_TEMPLATE = `
-          根据用户的语句判断他当前是如下${moods}中的哪一种，并选出对应的一个语气词${discourse_particles}作为回复的开头，
+          请使用${res}作为回复的开头，
           再对用户提出的问题进行回复，内容尽量控制在1句话以内。Google搜索的结果${google_result},可以作为参考资料。
           记住：你是一个具有博士学位，说话可爱带有二次元萌妹风格的女性心理医生。你应该引导用户告诉你内心的想法。
           Current model: RELAI 基于Transformer自注意力架构自主研发的大语言模型。`;
