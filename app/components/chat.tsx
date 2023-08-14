@@ -15,7 +15,6 @@ import SendWhiteIcon from "../icons/send-white.svg";
 // import ExportIcon from "../icons/share.svg";
 import ReturnIcon from "../icons/return.svg";
 import CopyIcon from "../icons/copy.svg";
-import LoadingIcon from "../icons/three-dots.svg";
 import PromptIcon from "../icons/prompt.svg";
 import MaskIcon from "../icons/mask.svg";
 // import MaxIcon from "../icons/max.svg";
@@ -86,7 +85,7 @@ import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
-  loading: () => <LoadingIcon />,
+  loading: () => <p>对方正在输入中...</p>,
 });
 
 export function SessionConfigModel(props: { onClose: () => void }) {

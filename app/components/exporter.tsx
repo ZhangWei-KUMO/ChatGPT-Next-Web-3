@@ -15,7 +15,6 @@ import { IconButton } from "./button";
 import { copyToClipboard, downloadAs, useMobileScreen } from "../utils";
 
 import CopyIcon from "../icons/copy.svg";
-import LoadingIcon from "../icons/three-dots.svg";
 import ChatGptIcon from "../icons/chatgpt.png";
 import ShareIcon from "../icons/share.svg";
 
@@ -34,7 +33,7 @@ import { EXPORT_MESSAGE_CLASS_NAME } from "../constant";
 import { getClientConfig } from "../config/client";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
-  loading: () => <LoadingIcon />,
+  loading: () => <p>对方正在输入中...</p>,
 });
 
 export function ExportMessageModal(props: { onClose: () => void }) {
@@ -352,7 +351,7 @@ export function PreviewActions(props: {
           text={Locale.Export.Share}
           bordered
           shadow
-          icon={loading ? <LoadingIcon /> : <ShareIcon />}
+          icon={loading ? <p>对方正在输入中...</p> : <ShareIcon />}
           onClick={share}
         ></IconButton>
       </div>

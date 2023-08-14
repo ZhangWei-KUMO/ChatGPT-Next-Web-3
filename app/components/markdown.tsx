@@ -9,7 +9,6 @@ import { useRef, useState, RefObject, useEffect } from "react";
 import { copyToClipboard } from "../utils";
 import mermaid from "mermaid";
 
-import LoadingIcon from "../icons/three-dots.svg";
 import React from "react";
 import { useDebouncedCallback, useThrottledCallback } from "use-debounce";
 import { showImageModal } from "./ui-lib";
@@ -206,7 +205,7 @@ export function Markdown(
     >
       {inView.current &&
         (props.loading ? (
-          <LoadingIcon />
+          <p>对方正在输入中...</p>
         ) : (
           <MarkdownContent content={props.content} />
         ))}

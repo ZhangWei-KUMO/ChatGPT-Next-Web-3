@@ -7,7 +7,6 @@ import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
 import CopyIcon from "../icons/copy.svg";
 import ClearIcon from "../icons/clear.svg";
-import LoadingIcon from "../icons/three-dots.svg";
 import EditIcon from "../icons/edit.svg";
 import EyeIcon from "../icons/eye.svg";
 import {
@@ -447,7 +446,7 @@ export function Settings() {
             }
           >
             {checkingUpdate ? (
-              <LoadingIcon />
+              <p>对方正在输入中...</p>
             ) : hasNewVersion ? (
               <Link href={updateUrl} target="_blank" className="link">
                 {Locale.Settings.Update.GoToUpdate}

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import styles from "./ui-lib.module.scss";
-import LoadingIcon from "../icons/three-dots.svg";
+// import LoadingIcon from "../icons/three-dots.svg";
 import CloseIcon from "../icons/close.svg";
 import EyeIcon from "../icons/eye.svg";
 import EyeOffIcon from "../icons/eye-off.svg";
@@ -91,7 +91,7 @@ export function Loading() {
         justifyContent: "center",
       }}
     >
-      <LoadingIcon />
+      <p>对方正在输入中...</p>
     </div>
   );
 }
